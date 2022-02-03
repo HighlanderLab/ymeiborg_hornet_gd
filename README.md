@@ -1,3 +1,3 @@
 # ymeiborg_hornet_gd
 
-Discussion about modelling gene-drives for suppressing Asian Hornet
+Code for the preprint "The suppressive potential of a gene drive in populations of invasive social wasps is limited".
