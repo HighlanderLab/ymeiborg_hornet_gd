@@ -1,0 +1,424 @@
+###########
+## Setup ##
+###########
+
+rm(list = ls())
+
+packages <- c('AlphaSimR','tidyr', 'dplyr', 'reshape2', 'data.table',
+              'doParallel', 'compiler', 'ggplot2', 'extraDistr',
+              'patchwork','MetBrewer')
+
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE, repos='http://cran.us.r-project.org')
+      library(x, character.only = TRUE)
+    }
+  }
+)
+
+####################################
+## Gene Drive simulation function ##
+####################################
+
+modelHornets <- function(input){
+  
+  ##########################################
+  ## ---- Assign all variables in input ----
+  ##########################################
+  
+  for (i in 1:ncol(input)) {assign(names(input)[i], input[,i])}
+  
+  ######################
+  ## Define functions ##
+  ######################
+  
+  source("../AltphaSimR.R")
+  
+  gdStartPop <- function (founderPop, N, nGD, gdSex, simParam = SP) {
+    
+    pop <- newPop(founderPop, simParam = simParam)
+    pop <- editGenomeFix(pop, ind = 1:pop@nInd, chr = rep(1, pop@nLoci), 
+                         segSites = 1:pop@nLoci, allele = 0, 
+                         simParam = simParam)
+    
+    pop_m <- pop[1:N]
+    pop_m@sex <- rep("M", pop_m@nInd)
+    
+    pop_f <- pop[(N+1):(N*2)]
+    pop_f@sex <- rep("F", pop_f@nInd)
+    
+    pop_gd <- pop[(N*2+1):(N*2+nGD)]
+    if (gdSex == "F"){
+      pop_gd@sex <- rep("F", pop_gd@nInd)
+      pop_gd <- editHaplo(pop_gd, ind = 1:nGD, chr = rep(1, pop_gd@nLoci), 
+                          segSites = 1:pop_gd@nLoci, allele = 1, 
+                          haplotype = rep(1, pop_gd@nLoci), simParam = simParam)
+    } else if (gdSex == "M") {
+      pop_gd@sex <- rep("M", pop_gd@nInd)
+      pop_gd <- editGenomeFix(pop_gd, ind = 1:nGD, chr = rep(1, pop_gd@nLoci), 
+                              segSites = 1:pop_gd@nLoci, allele = 1, 
+                              simParam = simParam)
+    }
+    
+    pop <- mergePops(list(pop_f, pop_m, pop_gd))
+    
+    return(pop)
+  }
+  
+  reproductivity <- function (pop, strategy = 1){
+    # If there are no individuals of either sex, the model stops later on
+    if ("M" %in% pop@sex) {
+      pop_m <- pop[pop@sex == "M"]
+    } else {
+      return(pop)}
+    if ("F" %in% pop@sex) {
+      pop_f <- pop[pop@sex == "F"]
+    } else {
+      return(pop)}
+    
+    if (strategy == 1){ # Neutral gene drive
+      return(pop)
+    }
+    
+    if (strategy == 2){ # Male infertility
+      haploDF <- createHaploDF(pop_m)
+      haplo1 <- haploDF[haplo == 1 & (locus1 == "GD" | locus1 == "NF"), id]
+      haplo2 <- haploDF[haplo == 2 & (locus1 == "GD" | locus1 == "NF"), id]
+      if (length(haplo1) > 0 & length(haplo2) > 0){
+        pop_m <- pop_m[!(pop_m@id %in% intersect(haplo1, haplo2))]
+        pop <- mergePops(list(pop_m, pop_f))
+      }
+      
+    } else if (strategy == 3) { # Female infertility
+      haploDF <- createHaploDF(pop_f)
+      haplo1 <- haploDF[haplo == 1 & (locus1 == "GD" | locus1 == "NF"), id]
+      haplo2 <- haploDF[haplo == 2 & (locus1 == "GD" | locus1 == "NF"), id]
+      if (length(haplo1) > 0 & length(haplo2) > 0){
+        pop_f <- pop_f[!(pop_f@id %in% intersect(haplo1, haplo2))]
+        pop <- mergePops(list(pop_m, pop_f))
+      }
+    } else if (strategy == 4) { # Female infertility
+      haploDF <- createHaploDF(pop)
+      haplo1 <- haploDF[haplo == 1 & (locus1 == "GD" | locus1 == "NF"), id]
+      haplo2 <- haploDF[haplo == 2 & (locus1 == "GD" | locus1 == "NF"), id]
+      if (length(haplo1) > 0 & length(haplo2) > 0){
+        pop <- pop[!(pop@id %in% intersect(haplo1, haplo2))]
+      }
+    }
+    
+    return(pop)
+  }
+  
+  heterozygousMortality <- function(pop, pHeteroMort) {
+    if (pHeteroMort > 0) { 
+      haploDF <- createHaploDF(pop)
+      GDs <- haploDF[locus1 == "GD", id]
+      if (length(GDs) > 0) {
+        pop_GDs <- pop[pop@id %in% unique(GDs)]
+        pop <- pop[!(pop@id %in% pop_GDs@id)]
+        pop_GDs <- mortality(pop_GDs, mortality = pHeteroMort)
+        pop <- mergePops(list(pop, pop_GDs))
+      }
+    }
+    return(pop)
+  }
+  
+  createHaploDF <- function(pop, simParam = SP) {
+    haplotype <- setDT(bind_cols(name = row.names(pullQtlHaplo(pop, 
+                                                          simParam = simParam)), 
+                                 QTL_1 = pullQtlHaplo(pop, 
+                                                      simParam = simParam)[,1], 
+                                 QTL_2 = pullQtlHaplo(pop, 
+                                                      simParam = simParam)[,2]))
+    haplotype[, `:=`(id = strsplit(name, split = "_")[[1]][1], 
+                     haplo = strsplit(name, split = "_")[[1]][2]), 
+              by = name] [, name := NULL]
+    
+    haplotype[, locus1 := fifelse(test = QTL_1 == 1, 
+                                  yes = fifelse(test = QTL_2 == 1, 
+                                                yes = "GD", no = "RE"),
+                                  no = fifelse(test = QTL_2 == 1, 
+                                               yes = "NF", no = "WT"))]
+    return(haplotype[ , .(id, haplo, locus1)])
+  }
+  
+  maleDH <- function(pop, meanMaleProgeny, simParam = SP){
+    pop <- homing(pop, p_nhej = pnhej, cut_rate = cutRate, simParam = simParam)
+    tmp <- list()
+    for(ind in 1:pop@nInd){
+      tmp <- c(tmp, pop[ind])
+    }
+    tmp <- lapply(tmp, FUN = function(x) 
+      makeDH(x, nDH = actuar::rztpois(n = 1, lambda = meanMaleProgeny), 
+             keepParents = FALSE, simParam = simParam))
+    pop <- mergePops(tmp)
+    pop@sex <- rep("M", pop@nInd)
+    return(pop)
+  }
+  
+    maleOffspring <- function(pop, meanMaleProgeny, simParam = SP){
+    pop <- homing(pop, p_nhej = pnhej, cut_rate = cutRate, simParam = simParam)
+    tmp <- list()
+    for(ind in 1:pop@nInd){
+      tmp <- c(tmp, pop[ind])
+    }
+    tmp <- lapply(tmp, FUN = function(x) 
+      makeDH(x, nDH = actuar::rztpois(n = 1, lambda = meanMaleProgeny), 
+             keepParents = FALSE, simParam = simParam))
+    pop <- mergePops(tmp)
+    pop@sex <- rep("M", pop@nInd)
+    return(pop)
+  }
+  
+  polyandryCross <- function(pop, fertileFemales, fertileMales,
+                             femaleMatings, maleMatings, 
+                             maxFem, maxMal, simParam = SP) {
+    pop_f <- pop[pop@sex == "F"]
+    pop_m <- pop[pop@sex == "M"]
+    
+    nMates <- rtpois(pop_f@nInd, femaleMatings, 0, maxFem)
+    nMatesMale <- rtpois(pop_m@nInd, maleMatings, -Inf, maxMal)
+    if (sum(nMates) < 1 | sum(nMatesMale) < 1) {
+      crossPlan <- as.data.table(matrix(NA, ncol = 2, nrow = 0))
+      return(crossPlan) # Return an empty crossPlan
+    }
+    
+    crossPlan <- as.data.table(matrix(NA, ncol = 2, nrow = sum(nMates)))
+    setnames(crossPlan, c("Mothers", "Fathers"))
+    
+    crossPlan[, Mothers := rep(pop_f@id, nMates)]
+    
+    maleIDs <- rep(pop_m@id, nMatesMale)
+    if (length(maleIDs) < sum(nMates)) {
+      crossPlan <- crossPlan[match(sample(Mothers, 
+                                          length(maleIDs)),
+                                   Mothers),][,Fathers := sample(maleIDs, 
+                                                              length(maleIDs))]
+    } else {
+      crossPlan <- crossPlan[, Fathers := sample(maleIDs, nrow(crossPlan))]
+    }
+
+    # Keep only fertile crosses
+    crossPlan <- crossPlan[Mothers %in% fertileFemales & Fathers %in% fertileMales]
+    
+    return(as.matrix(crossPlan))
+  }
+  
+  femaleOffspring <- function(females, males, crossPlan, meanProgeny, 
+                              simParam = SP){
+    females <- homing(females, p_nhej = pnhej, cut_rate = cutRate, 
+                      simParam = simParam)
+    
+    offspring <- makeCross2_pois(females = females, 
+                                 males = males, crossPlan = crossPlan, 
+                                 meanProgeny = meanProgeny, simParam = simParam)
+    offspring@sex <- rep("F", offspring@nInd) 
+    
+    return(offspring)
+  }
+ 
+  homing <- function(pop, p_nhej, cut_rate, simParam = SP) {
+    haplotype <- as_tibble(createHaploDF(pop))
+    
+    for (row in seq(1, nrow(haplotype), 2)) {
+      for (column in 3:ncol(haplotype)){
+        tmpHaplo <- haplotype[row:(row+1), c(1:2, column)]
+        if (!any(tmpHaplo[,3] == "GD")) {next}
+        qtl <- which(3:ncol(haplotype) == column)*2
+        if (any(tmpHaplo[, 3] == "WT") & 
+            any(tmpHaplo[, 3] == "GD")){
+          if (runif(1) < cut_rate) { # Cutting
+            if (runif(1) < 1-p_nhej) { # Homing
+              pop <- editHaplo(pop = pop, 
+                               ind = which(seq(1, nrow(haplotype), 2) == row), 
+                               chr = rep(1, 2),
+                               segSites = (qtl-1):qtl,
+                               allele = 1, # 1 because it's the gene drive
+                               haplotype = which(tmpHaplo[,3] != "GD"),
+                               simParam = simParam)
+            } else if (runif(1) < 2/3) { # NHEJ, non-functional repair
+              pop <- editHaplo(pop = pop, 
+                               ind = which(seq(1, nrow(haplotype), 2) == row), 
+                               chr = rep(1, 2),
+                               segSites = (qtl-1):qtl,
+                               allele = c(0, 1), # 0,1 for NF
+                               haplotype = which(tmpHaplo[,3] != "GD"), 
+                               simParam = simParam)
+            }  else { # NHEJ, functional repair
+              pop <- editHaplo(pop = pop, 
+                               ind = which(seq(1, nrow(haplotype), 2) == row), 
+                               chr = rep(1, 2),
+                               segSites = (qtl-1):qtl,
+                               allele = c(1, 0), # 1,0 for RE
+                               haplotype = which(tmpHaplo[,3] != "GD"), 
+                               simParam = simParam)
+            }
+          }
+        }
+      }
+    }
+    
+    return(pop)
+  }
+  
+  mortality <- function(pop, mortality){
+    if (mortality == 0){
+      return(pop)
+    }
+    deaths <- which(runif(pop@nInd) < mortality)
+    pop <- pop[-deaths]
+    pop
+  }
+  
+  ######################################
+  ## Initialise population parameters ##
+  ######################################
+  
+  founderPop <- quickHaplo(nInd=(N*2+nGD), nChr=1, segSites=2, genLen = 0)
+  
+  SP <- SimParam$new(founderPop)
+  SP$addTraitA(nQtlPerChr=2)
+  SP$setSexes("yes_sys")
+  
+  #################################
+  ## Setup data collection table ##
+  #################################
+  
+  pop <- gdStartPop(founderPop = founderPop, N = N, nGD = nGD, gdSex = gdSex, simParam = SP)
+  N0 <- pop[pop@sex == "F"]@nInd
+  
+  # Track population information
+  generation <- 0:generations
+  var <- c('popSizeF', 'WT', 'GD', 'NF', 'RE', 'homoWT', 'homoGD', 'heteroGD')
+  results <- array(NA,
+                   dim=c(length(generation),length(var)),
+                   dimnames=list(generation=generation, var=var))
+  results[1, var] <- c(N0,
+                       ((N*2)+ifelse(gdSex == "F", nGD, 0))/(N0 * 2), 
+                       ifelse(gdSex == "F", nGD/(N0 * 2), 0), 
+                       0, 
+                       0, 
+                       N, 
+                       0, 
+                       ifelse(gdSex == "F", nGD, 0))
+  
+  #####################
+  ## Start modelling ##
+  #####################
+  
+  for(generation in 1:generations){
+    
+    cat("\r",sprintf("Generation %i/%i...", generation, generations))
+    
+    #########################
+    ## Population dynamics ##
+    #########################
+
+    # Heterozygous mortality deaths
+    heterozygousMortality(pop = pop, pHeteroMort = pHMort)
+    
+    # Get infertile individuals and log their IDs
+    fertiles <- reproductivity(pop, strategy = strategy)
+
+    queens <- fertiles[fertiles@sex == "F"]
+    drones <- fertiles[fertiles@sex == "M"]
+    
+    if (queens@nInd == 0 | drones@nInd == 0) {  
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                               length((generation + 1):nrow(results)))
+      break
+    }
+    
+    # Females lay unfertilized male eggs
+    offspring_m <- maleOffspring(queens, 
+                          meanMaleProgeny = meanMalProgeny, 
+                          simParam = SP)
+    
+    # Makes cross plan based on whole population 
+    # Filters out the infertile individuals
+    crossPlan <- polyandryCross(pop = pop,
+                                fertileFemales = queens@id,
+                                fertileMales = drones@id, 
+                                femaleMatings = meanFemMatings,
+                                maleMatings = meanMalMatings,
+                                maxFem = maxFemMatings,
+                                maxMal = maxMalMatings,
+                                simParam = SP)
+    
+    if (nrow(crossPlan) == 0) {  
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                                             length((generation + 1):nrow(results)))
+      break
+    }
+    
+    # Females mate and produce female offspring, multiple mating
+    offspring_f <- femaleOffspring(females = queens, 
+                                  males = drones, 
+                                  crossPlan = crossPlan,
+                                  meanProgeny = meanFemProgeny,
+                                  simParam = SP)
+    
+    # Density dependent population mortality
+    # Estimate population growth with logistic function
+    Nt <- queens@nInd
+    maxPopSize <- rpois(1, k/(1+((k-Nt)/Nt)*rmax^-1))
+    fmort <- 1-maxPopSize/offspring_f@nInd
+    offspring_f <- mortality(offspring_f, fmort) #some fertilized queens die
+    
+    pop <- mergePops(list(offspring_f, offspring_m))
+    
+    if (offspring_f@nInd == 0 | offspring_m@nInd == 0) {
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                               length((generation + 1):nrow(results)))
+      break
+    }
+    
+    #############################
+    ## Track population values ##
+    #############################
+    
+    haploDF       <- createHaploDF(offspring_f)
+    countHaplo    <- haploDF[, .N, by = locus1]
+    haploDFWider  <- setDT(pivot_wider(haploDF, id_cols = id, 
+                                       names_from = haplo, 
+                                       names_prefix = "haplo", 
+                                       values_from = locus1))
+    popSizeF      <- offspring_f@nInd
+    WT            <- ifelse(length(countHaplo[locus1 == "WT", N]) > 0, 
+                            yes = countHaplo[locus1 == "WT", N]/(popSizeF * 2),
+                            no = 0)
+    GD            <- ifelse(length(countHaplo[locus1 == "GD", N]) > 0, 
+                            yes = countHaplo[locus1 == "GD", N]/(popSizeF * 2),
+                            no = 0)
+    NF            <- ifelse(length(countHaplo[locus1 == "NF", N]) > 0, 
+                            yes = countHaplo[locus1 == "NF", N]/(popSizeF * 2),
+                            no = 0)
+    RE            <- ifelse(length(countHaplo[locus1 == "RE", N]) > 0, 
+                            yes = countHaplo[locus1 == "RE", N]/(popSizeF * 2),
+                            no = 0)
+    homoWT        <- haploDFWider[haplo1 == "WT" & haplo2 == "WT", .N]
+    homoGD        <- haploDFWider[haplo1 == "GD" & haplo2 == "GD", .N]
+    heteroGD      <- haploDFWider[xor(haplo1 == "GD", haplo2 == "GD"), .N]
+    
+    
+    for (v in var) {
+      results[generation+1,v] <- get(x=v)
+    }
+  }
+  
+  ###########################
+  ## ---- Process output ----
+  ###########################
+  
+  results <- cbind(generation=0:generations, input, results, row.names = NULL) 
+  
+  return(results)
+}
+
+######################
+## Compile function ##
+######################
+
+modelHornets.comp <- cmpfun(modelHornets)
