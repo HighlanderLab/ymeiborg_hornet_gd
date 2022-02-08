@@ -375,6 +375,12 @@ modelHornets <- function(input){
                                 maxMal = maxMalMatings,
                                 simParam = SP)
     
+    if (nrow(crossPlan) == 0) {  
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                                             length((generation + 1):nrow(results)))
+      break
+    }
+    
     ##### Mortality ##### 
     # Density dependent female mortality with logistic function
     Nt <- queens@nInd
