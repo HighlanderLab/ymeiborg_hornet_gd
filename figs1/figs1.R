@@ -2,7 +2,7 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/fig2")
+setwd("/scratch/bell/ymeiborg/figs1")
 
 source("../model_function.R")
 
@@ -10,17 +10,17 @@ source("../model_function.R")
 ######## load data ##########
 #############################
 
-load(file = "../fig2a/Fig2a.Rdata")
-load(file = "../fig2b/Fig2b.Rdata")
+load(file = "../figs1a/FigS1a.Rdata")
+load(file = "../figs1b/FigS1b.Rdata")
 
 #########################################
 ########## Plot plots ###################
 #########################################
 
-fig2 <- fig2a / fig2b +
+figs1 <- figs1a / figs1b +
   plot_layout(guides = 'collect') & theme(legend.position='bottom') &
   plot_annotation(tag_levels = 'A') &
   theme(plot.tag = element_text(size = 17))
-fig2
+figs1
 
-ggsave(plot = fig2, filename = "Fig2.png", height = 25, width = 20, unit = "cm")
+ggsave(plot = figs1, filename = "FigS1.png", height = 25, width = 20, unit = "cm")

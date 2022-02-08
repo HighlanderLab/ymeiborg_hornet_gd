@@ -3,7 +3,6 @@
 ##########################
 
 setwd("/scratch/bell/ymeiborg/fig3a")
-
 source("../model_function.R")
 
 #########################################
@@ -15,7 +14,7 @@ input <- list()
 input$repetitions <- 1:10 # number of reps
 input$generations <- 25 #runtime of the simulation
 
-input$meanFemProgeny <- 300 #average of femlae progeny per queen
+input$meanFemProgeny <- 300 #average of female progeny per queen
 input$meanMalProgeny <- 300 #average of male progeny per queen
 input$meanFemMatings <- 3.275 #average number of times females mate
 input$meanMalMatings <- 0.9 #average number of times males mate
@@ -29,7 +28,7 @@ input$nGD <- 100 #number of gene drive carrying animals to introduce
 input$multiplex <- 1 #how many multiplexes in the gene drives, not used currently
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
 input$pnhej <- seq(0, 0.02, 0.001) #probability of non-homologous end joining, determines the resistance alleles (0.2 in mosquitos)
-input$cutRate <- seq(0.8, 1, 0.01) #propability CRISPR cuts the opposite DNA strand
+input$cutRate <- seq(0.8, 1, 0.01) #probability CRISPR cuts the opposite DNA strand
 input$pHMort <- 0 #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
@@ -97,6 +96,7 @@ fig3a <- ggplot(data = heatMapData) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Nonhomologous endjoining)") +
   ylab("P(Cutting)") +
+  ggtitle("Asian hornet") +
   PaperTheme
 fig3a
 

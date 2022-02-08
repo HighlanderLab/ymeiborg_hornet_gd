@@ -30,8 +30,7 @@ input$multiplex <- 1 #how many multiplexes in the gene drives, not used currentl
 input$strategy <- c(1,2,3,4) #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
 input$pnhej <- 0.02 #probability of non-homologous end joining, determines the resistance alleles (0.2 in mosquitos)
 input$cutRate <- 0.95 #propability CRISPR cuts the opposite DNA strand
-input$hEffect <- FALSE #logical, determines whether there is a fitness cost associated with the gene drive
-input$pHMort <- 0 #only if hEffect == TRUE, mortality of gene drive carriers.
+input$pHMort <- 0 #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
 #########################################
@@ -62,6 +61,16 @@ save(modelOutput, file = "Fig2a.Rdata")
 ########## Plot plots ###################
 #########################################
 
+PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        title=element_text(size=14, hjust=0.5), 
+        legend.title=element_text(size=12),
+        legend.position = "bottom", 
+        legend.justification = "center",
+        axis.title=element_text(size=12),
+        plot.title = element_text(hjust = 0.5))
+
 modelOutput <- as_tibble(modelOutput)
 
 modelOutput <- mutate(modelOutput,
@@ -73,7 +82,7 @@ modelOutput <- mutate(modelOutput,
                         rmax = factor(rmax),
                         generations = factor(generations),
                         repetitions = factor(repetitions),
-                        hEffect = factor(hEffect),
+                      pHMort = factor(pHMort),
                         pHMort = factor(pHMort))
 
 haploRep <- as_tibble(modelOutput) %>% 
@@ -88,7 +97,7 @@ haploRep$`Introduction sex` = factor(haploRep$`Introduction sex`,
                            levels = c(1,2),
                            labels = c("Female","Male"))
 
-p1 <- ggplot(data = haploRep) +
+fig2a <- ggplot(data = haploRep) +
   facet_grid(
     `Introduction sex` ~ strategy,
     scales = "fixed",
@@ -102,23 +111,17 @@ p1 <- ggplot(data = haploRep) +
   )) +
   scale_colour_manual(values=met.brewer("Greek", 4)) +
   xlab("Generation") +
-  labs(title = "Asian hornet")
-p1
+  ggtitle("Asian hornet") +
+  PaperTheme
+fig2a
 
-PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        title=element_text(size=14, hjust=0.5), 
-        legend.title=element_text(size=12),
-        legend.position = "bottom", 
-        legend.justification = "center",
-        axis.title=element_text(size=12),
-        plot.title = element_text(hjust = 0.5))
+ggsave(plot = fig2a, filename = "Fig2a.png", height = 12, width = 20, unit = "cm")
 
-ggsave(plot = p1 + PaperTheme, filename = "Fig2a.png", height = 12, width = 20, unit = "cm")
-fig2a <- p1 + PaperTheme
-save(fig2a, file = "Fig2a_plot.Rdata")
+#########################################
+########## Save model ###################
+#########################################
 
+save(modelOutput, fig2a, file = "Fig2a.Rdata")
 
 ###################
 ##### Get SD ######

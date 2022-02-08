@@ -30,8 +30,7 @@ input$multiplex <- 1 #how many multiplexes in the gene drives, not used currentl
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
 input$pnhej <- c(0, 0.02) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
 input$cutRate <- c(1, 0.95) #propability CRISPR cuts the opposite DNA strand
-input$hEffect <- c(FALSE, TRUE) #logical, determines whether there is a fitness cost associated with the gene drive
-input$pHMort <- c(0,0.1) #only if hEffect == TRUE, mortality of gene drive carriers.
+input$pHMort <- c(0,0.1) #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
 inputs <- inputs %>%
@@ -42,8 +41,8 @@ inputs <- inputs %>%
             (meanFemProgeny==10 & meanMalProgeny==10 & meanFemMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
             (meanFemProgeny==10 & meanMalProgeny==10 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
             (meanFemProgeny==meanMalProgeny & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2)) &
-           ((cutRate == 1 & hEffect == FALSE & pHMort == 0 & pnhej == 0) |
-           (cutRate == 0.95 & hEffect == TRUE & pHMort == 0.1 & pnhej == 0.02)))
+           ((pnhej == 0 & cutRate == 1 & pHMort == 0) |
+              (pnhej == 0.02 & cutRate == 0.95 & pHMort == 0.1)))
 
 #########################################
 ########## Run model ####################
@@ -67,7 +66,7 @@ modelOutput <- apply(modelOutput, 2, c)
 ########## Save model ###################
 #########################################
 
-save(modelOutput, file = "Fig7.Rdata")
+save(modelOutput, file = "FigS3.Rdata")
 
 ##################
 ## ---- Plots ----
@@ -87,47 +86,6 @@ modelOutput <- rowwise(modelOutput) %>%
     rmax != 10 ~ "rmax",
     TRUE ~ "default"
   )) 
-# %>%
-#   mutate(meanProgeny = case_when(
-#     meanProgeny == 2 ~ -2,
-#     meanProgeny == 6 ~ -1,
-#     meanProgeny == 10 ~ 0,
-#     meanProgeny == 14 ~ 1,
-#     meanProgeny == 18 ~ 2
-#   )) %>%
-#   mutate(meanFemMatings = case_when(
-#     meanFemMatings == 0.1 ~ -2,
-#     meanFemMatings == 0.15 ~ -1,
-#     meanFemMatings == 0.2 ~ 0,
-#     meanFemMatings == 0.25 ~ 1,
-#     meanFemMatings == 0.3 ~ 2
-#   )) %>%
-#   mutate(meanMalMatings = case_when(
-#     meanMalMatings == 0.1 ~ -2,
-#     meanMalMatings == 0.15 ~ -1,
-#     meanMalMatings == 0.2 ~ 0,
-#     meanMalMatings == 0.25 ~ 1,
-#     meanMalMatings == 0.3 ~ 2
-#   )) %>%
-#   mutate(maxFemMatings = case_when(
-#     maxFemMatings == 1 ~ -1,
-#     maxFemMatings == 2 ~ 0,
-#     maxFemMatings == 3 ~ 1,
-#     maxFemMatings == 4 ~ 2
-#   )) %>%
-#   mutate(maxMalMatings = case_when(
-#     maxMalMatings == 1 ~ -1,
-#     maxMalMatings == 2 ~ 0,
-#     maxMalMatings == 3 ~ 1,
-#     maxMalMatings == 4 ~ 2
-#   )) %>%
-#   mutate(rmax = case_when(
-#     rmax == 2 ~ -2,
-#     rmax == 6 ~ -1,
-#     rmax == 10 ~ 0,
-#     rmax == 14 ~ 1,
-#     rmax == 18 ~ 2
-#   ))
 
 modelOutputOptimal <- filter(modelOutput, cutRate == 1)
 modelOutputRealistic <- filter(modelOutput, cutRate == 0.95)

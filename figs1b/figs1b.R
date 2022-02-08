@@ -30,8 +30,7 @@ input$multiplex <- 1 #how many multiplexes in the gene drives, not used currentl
 input$strategy <- c(1,2,3,4) #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
 input$pnhej <- 0.02 #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
 input$cutRate <- 0.95 #propability CRISPR cuts the opposite DNA strand
-input$hEffect <- FALSE #logical, determines whether there is a fitness cost associated with the gene drive
-input$pHMort <- 0 #only if hEffect == TRUE, mortality of gene drive carriers.
+input$pHMort <- 0 #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
 #########################################
@@ -56,11 +55,21 @@ modelOutput <- apply(modelOutput, 2, c)
 ########## Save model ###################
 #########################################
 
-save(modelOutput, file = "Fig2bS1.Rdata")
+save(modelOutput, file = "FigS1b.Rdata")
 
 #########################################
 ########## Plot plots ###################
 #########################################
+
+PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        title=element_text(size=12, hjust=0.5),
+        legend.title=element_text(size=12),
+        legend.position = "bottom",
+        legend.justification = "center",
+        axis.title=element_text(size=12),
+        plot.title = element_text(hjust = 0.5))
 
 modelOutput <- as_tibble(modelOutput)
 
@@ -88,17 +97,7 @@ haploRep$`Introduction sex` = factor(haploRep$`Introduction sex`,
                            levels = c(1,2),
                            labels = c("Female","Male"))
 
-PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        title=element_text(size=12, hjust=0.5),
-        legend.title=element_text(size=12),
-        legend.position = "bottom",
-        legend.justification = "center",
-        axis.title=element_text(size=12),
-        plot.title = element_text(hjust = 0.5))
-
-p1 <- ggplot(data = haploRep) +
+figs1b <- ggplot(data = haploRep) +
   facet_grid(
     `Introduction sex` ~ strategy,
     scales = "fixed",
@@ -114,9 +113,8 @@ p1 <- ggplot(data = haploRep) +
   xlab("Generation") +
   labs(title = "European paper wasp") +
   PaperTheme
-p1
+figs1b
 
-ggsave(plot = p1, filename = "Fig5bS1.png", height = 12, width = 20, unit = "cm")
+ggsave(plot = figs1b, filename = "FigS1b.png", height = 12, width = 20, unit = "cm")
 
-fig5bs1 <- p1 + PaperTheme
-save(fig5bs1, file = "Fig2bS1_plot.Rdata")
+save(modelOutput, figs1b, file = "FigS1b.Rdata")

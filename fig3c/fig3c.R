@@ -25,10 +25,9 @@ input$N <- 1000 #size of start WT population
 input$gdSex <- "F" #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
-input$pnhej <- seq(0, 0.02, 0.002) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
-input$cutRate <- 1 #propability CRISPR cuts the opposite DNA strand
-input$hEffect <- TRUE #logical, determines whether there is a fitness cost associated with the gene drive
-input$pHMort <- seq(0, 0.5, 0.05) #only if hEffect == TRUE, mortality of gene drive carriers.
+input$pnhej <- seq(0, 0.02, 0.001) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
+input$cutRate <- 1 #probability CRISPR cuts the opposite DNA strand
+input$pHMort <- seq(0, 0.5, 0.025) #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
 #########################################
@@ -55,3 +54,54 @@ modelOutput <- apply(modelOutput, 2, c)
 
 save(modelOutput, file = "Fig3c.Rdata")
 
+#########################################
+########## Plot plots ###################
+#########################################
+
+PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        title=element_text(size=14, hjust=0.5), 
+        legend.title=element_text(size=12),
+        legend.position = "bottom", 
+        legend.justification = "center",
+        axis.title=element_text(size=12))
+
+modelOutput <- as_tibble(modelOutput)
+
+modelOutput <- mutate(modelOutput,
+                      strategy = factor(strategy),
+                      N = factor(N),
+                      nGD = factor(nGD),
+                      k = factor(k),
+                      gdSex = factor(gdSex),
+                      rmax = factor(rmax),
+                      generations = factor(generations),
+                      repetitions = factor(repetitions),
+                      pHMort = factor(pHMort),
+                      cutRate = factor(cutRate))
+
+heatMapData <- select(modelOutput, generation, repetitions, pnhej, pHMort, popSizeF) %>%
+  filter(generation == max(generation)) %>%
+  rowwise() %>%
+  mutate(suppressed = case_when(popSizeF == 0 ~ 1,
+                                popSizeF > 0 ~ 0)) %>%
+  group_by(pnhej, pHMort) %>%
+  summarise(suppressionRate = sum(suppressed)/10)
+
+fig3c <- ggplot(data = heatMapData) +
+  geom_raster(aes(x = pnhej, y = pHMort, fill = suppressionRate)) +
+  scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
+  xlab("P(Nonhomologous endjoining)") +
+  ylab("P(GD heterozygote mortality)") +
+  ggtitle("Asian hornet") +
+  PaperTheme
+fig3c
+
+ggsave(plot = fig3c, filename = "Fig3c.png", height = 11, width = 10, unit = "cm")
+
+#########################################
+########## Save model ###################
+#########################################
+
+save(modelOutput, fig3c, file = "Fig3c.Rdata")
