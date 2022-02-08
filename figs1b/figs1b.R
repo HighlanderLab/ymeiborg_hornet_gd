@@ -2,7 +2,7 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/fig2bs1")
+setwd("/scratch/bell/ymeiborg/figs1b")
 
 source("../model_function.R")
 
@@ -82,7 +82,7 @@ modelOutput <- mutate(modelOutput,
                         rmax = factor(rmax),
                         generations = factor(generations),
                         repetitions = factor(repetitions),
-                        hEffect = factor(hEffect),
+                        pHMort = factor(pHMort),
                         cutRate = factor(cutRate))
 
 haploRep <- as_tibble(modelOutput) %>% 
