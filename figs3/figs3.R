@@ -183,7 +183,7 @@ p2 <- ggplot(data = lastGenStatsRealistic) +
   geom_point(aes(x = value, y = mLastGen, colour = name)) +
   geom_errorbar(aes(x = value, y = mLastGen, ymin = lower, ymax = upper), 
                 size = 0.1, width = 0.1) +
-  ylim(c(0,NA)) +
+  ylim(c(0,25)) +
   ylab("Last viable generation") +
   xlab("Parameter value") +
   scale_colour_manual(values=met.brewer("Greek", 6)) +
@@ -266,7 +266,7 @@ p4 <- ggplot(data = lastGenStatsOptimal) +
   geom_point(aes(x = value, y = mLastGen, colour = name)) +
   geom_errorbar(aes(x = value, y = mLastGen, ymin = lower, ymax = upper), 
                 size = 0.1, width = 0.1) +
-  ylim(c(0,NA)) +
+  ylim(c(0,25)) +
   ylab("Last viable generation") +
   xlab("Parameter value") +
   scale_colour_manual(values=met.brewer("Greek", 6)) +
