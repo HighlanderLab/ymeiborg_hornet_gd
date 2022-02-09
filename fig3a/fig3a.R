@@ -105,4 +105,3 @@ ggsave(plot = fig3a, filename = "Fig3a.png", height = 11, width = 10, unit = "cm
 #########################################
 
 save(modelOutput, fig3a, file = "Fig3a.Rdata")
-
