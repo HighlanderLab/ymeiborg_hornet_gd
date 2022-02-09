@@ -1,5 +1,5 @@
 ##########################
-###########setup #########
+########## Setup #########
 ##########################
 
 setwd("/scratch/bell/ymeiborg/fig3d")
@@ -13,8 +13,8 @@ input <- list()
 
 input$repetitions <- 1 # number of reps
 input$generations <- 50 #runtime of the simulation
-input$meanFemProgeny <- 10 #average of female progeny per queen
-input$meanMalProgeny <- 10 #average of male progeny per queen
+input$meanFemProgeny <- 20 #average of female progeny per queen
+input$meanMalProgeny <- 20 #average of male progeny per queen
 input$meanFemMatings <- 0.2 #average number of times females mate
 input$meanMalMatings <- 0.2 #average number of times males mate
 input$maxFemMatings <- 2 #maximum number of times females mate
@@ -25,10 +25,9 @@ input$N <- 1000 #size of start WT population
 input$gdSex <- "F" #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
-input$pnhej <- seq(0, 0.02, 0.002) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
-input$cutRate <- 1 #propability CRISPR cuts the opposite DNA strand
-
-input$pHMort <- seq(0, 0.5, 0.05) #only if hEffect == TRUE, mortality of gene drive carriers.
+input$pnhej <- seq(0, 0.02, 0.001) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
+input$cutRate <- 1 #probability CRISPR cuts the opposite DNA strand
+input$pHMort <- seq(0, 0.5, 0.025) #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
 #########################################
@@ -54,3 +53,4 @@ modelOutput <- apply(modelOutput, 2, c)
 #########################################
 
 save(modelOutput, file = "Fig3d_2.Rdata")
+

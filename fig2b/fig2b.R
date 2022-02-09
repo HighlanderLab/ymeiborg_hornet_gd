@@ -15,8 +15,8 @@ input <- list()
 input$repetitions <- 1:10 # number of reps
 input$generations <- 25 #runtime of the simulation
 
-input$meanFemProgeny <- 10 #average of female progeny per queen
-input$meanMalProgeny <- 10 #average of male progeny per queen
+input$meanFemProgeny <- 20 #average of female progeny per queen
+input$meanMalProgeny <- 20 #average of male progeny per queen
 input$meanFemMatings <- 0.2 #average number of times females mate
 input$meanMalMatings <- 0.2 #average number of times males mate
 input$maxFemMatings <- 2 #maximum number of times females mate

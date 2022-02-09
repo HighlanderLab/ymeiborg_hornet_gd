@@ -26,9 +26,8 @@ input$gdSex <- "F" #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
 input$pnhej <- 0 #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
-input$cutRate <- seq(0.8, 1, 0.01) #propability CRISPR cuts the opposite DNA strand
-input$hEffect <- TRUE #logical, determines whether there is a fitness cost associated with the gene drive
-input$pHMort <- seq(0, 0.5, 0.025) #only if hEffect == TRUE, mortality of gene drive carriers.
+input$cutRate <- seq(0.8, 1, 0.01) #probability CRISPR cuts the opposite DNA strand
+input$pHMort <- seq(0, 0.5, 0.025) #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
 #########################################

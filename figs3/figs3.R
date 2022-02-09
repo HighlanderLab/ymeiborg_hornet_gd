@@ -15,8 +15,8 @@ input <- list()
 input$repetitions <- 1:10 # number of reps
 input$generations <- 25 #runtime of the simulation
 
-input$meanFemProgeny <- c(2,6,10,14,18) #average of female progeny per queen
-input$meanMalProgeny <- c(2,6,10,14,18) #average of male progeny per queen
+input$meanFemProgeny <- c(2,11,20,29,38) #average of female progeny per queen
+input$meanMalProgeny <- c(2,11,20,29,38) #average of male progeny per queen
 input$meanFemMatings <- c(0.1,0.15,0.2,0.25,0.3) #average number of times females mate
 input$meanMalMatings <- c(0.1,0.15,0.2,0.25,0.3) #average number of times males mate
 input$maxFemMatings <- c(1,2,3,4) #maximum number of times females mate
@@ -34,12 +34,12 @@ input$pHMort <- c(0,0.1) #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
 inputs <- inputs %>%
-  filter(((meanFemProgeny==10 & meanMalProgeny==10 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
-            (meanFemProgeny==10 & meanMalProgeny==10 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2) |
-            (meanFemProgeny==10 & meanMalProgeny==10 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxMalMatings==2) |
-            (meanFemProgeny==10 & meanMalProgeny==10 & meanFemMatings==0.2 & meanMalMatings==0.2 & maxFemMatings==2 & maxMalMatings==2) |
-            (meanFemProgeny==10 & meanMalProgeny==10 & meanFemMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
-            (meanFemProgeny==10 & meanMalProgeny==10 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
+  filter(((meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2) |
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxMalMatings==2) |
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.2 & maxFemMatings==2 & maxMalMatings==2) |
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
             (meanFemProgeny==meanMalProgeny & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2)) &
            ((pnhej == 0 & cutRate == 1 & pHMort == 0) |
               (pnhej == 0.02 & cutRate == 0.95 & pHMort == 0.1)))
@@ -78,7 +78,7 @@ modelOutput <- rowwise(modelOutput) %>%
   select(-meanMalProgeny) %>%
   rename(meanProgeny = meanFemProgeny) %>% 
   mutate(variableRange = case_when(
-    meanProgeny != 10 ~ "meanProgeny",
+    meanProgeny != 20 ~ "meanProgeny",
     meanFemMatings != 0.2 ~ "meanFemMatings",
     meanMalMatings != 0.2 ~ "meanMalMatings",
     maxFemMatings != 2 ~ "maxFemMatings",

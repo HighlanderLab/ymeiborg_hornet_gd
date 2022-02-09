@@ -13,11 +13,11 @@ input <- list()
 
 input$repetitions <- 1:10 # number of reps
 input$generations <- 50 #runtime of the simulation
-input$meanFemProgeny <- 300 #average of female progeny per queen
-input$meanMalProgeny <- 300 #average of male progeny per queen
-input$meanFemMatings <- 3.275 #average number of times females mate
-input$meanMalMatings <- 0.9 #average number of times males mate
-input$maxFemMatings <- 4 #maximum number of times females mate
+input$meanFemProgeny <- 20 #average of female progeny per queen
+input$meanMalProgeny <- 20 #average of male progeny per queen
+input$meanFemMatings <- 0.2 #average number of times females mate
+input$meanMalMatings <- 0.2 #average number of times males mate
+input$maxFemMatings <- 2 #maximum number of times females mate
 input$maxMalMatings <- 2 #maximum number of times males mate
 input$k <- 1000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
 input$rmax <- 10 #growth rate of the population

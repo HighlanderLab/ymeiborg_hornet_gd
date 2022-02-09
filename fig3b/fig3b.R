@@ -13,9 +13,8 @@ input <- list()
 
 input$repetitions <- 1:10 # number of reps
 input$generations <- 25 #runtime of the simulation
-
-input$meanFemProgeny <- 10 #average of female progeny per queen
-input$meanMalProgeny <- 10 #average of male progeny per queen
+input$meanFemProgeny <- 20 #average of female progeny per queen
+input$meanMalProgeny <- 20 #average of male progeny per queen
 input$meanFemMatings <- 0.2 #average number of times females mate
 input$meanMalMatings <- 0.2 #average number of times males mate
 input$maxFemMatings <- 2 #maximum number of times females mate
@@ -23,9 +22,8 @@ input$maxMalMatings <- 2 #maximum number of times males mate
 input$k <- 1000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
 input$rmax <- 10 #growth rate of the population
 input$N <- 1000 #size of start WT population
-input$gdSex <- "F"  #which sex carries the gene drive F or M
+input$gdSex <- "F" #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce
-input$multiplex <- 1 #how many multiplexes in the gene drives, not used currently
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
 input$pnhej <- seq(0, 0.02, 0.001) #probability of non-homologous end joining, determines the resistance alleles (0.2 in mosquitos)
 input$cutRate <- seq(0.8, 1, 0.01) #probability CRISPR cuts the opposite DNA strand
