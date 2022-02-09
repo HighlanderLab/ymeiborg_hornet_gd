@@ -82,7 +82,6 @@ modelOutput <- mutate(modelOutput,
                         rmax = factor(rmax),
                         generations = factor(generations),
                         repetitions = factor(repetitions),
-                        hEffect = factor(hEffect),
                         pHMort = factor(pHMort))
 
 haploRep <- as_tibble(modelOutput) %>% 
