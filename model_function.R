@@ -36,38 +36,35 @@ modelHornets <- function(input){
   
   source("../AltphaSimR.R")
   
-  gdStartPop <- function (founderPop, N, nGD, gdSex, simParam = SP) {
+  gdStartPop <- function(founderPop, N, nGD, gdSex, simParam = SP) {
     
     pop <- newPop(founderPop, simParam = simParam)
     pop <- editGenomeFix(pop, ind = 1:pop@nInd, chr = rep(1, pop@nLoci), 
                          segSites = 1:pop@nLoci, allele = 0, 
                          simParam = simParam)
     
-    pop_m <- pop[1:N]
-    pop_m@sex <- rep("M", pop_m@nInd)
-    
-    pop_f <- pop[(N+1):(N*2)]
+    pop_f <- pop[1:(N+nGD)]
     pop_f@sex <- rep("F", pop_f@nInd)
     
-    pop_gd <- pop[(N*2+1):(N*2+nGD)]
+    pop_m <- pop[(N+nGD+1):((N+nGD)*2)]
+    pop_m@sex <- rep("M", pop_m@nInd)
+    
     if (gdSex == "F"){
-      pop_gd@sex <- rep("F", pop_gd@nInd)
-      pop_gd <- editHaplo(pop_gd, ind = 1:nGD, chr = rep(1, pop_gd@nLoci), 
-                          segSites = 1:pop_gd@nLoci, allele = 1, 
-                          haplotype = rep(1, pop_gd@nLoci), simParam = simParam)
+      pop_f <- editHaplo(pop_f, ind = 1:nGD, chr = rep(1, pop_f@nLoci), 
+                          segSites = 1:pop_f@nLoci, allele = 1, 
+                          haplotype = rep(1, pop_f@nLoci), simParam = simParam)
     } else if (gdSex == "M") {
-      pop_gd@sex <- rep("M", pop_gd@nInd)
-      pop_gd <- editGenomeFix(pop_gd, ind = 1:nGD, chr = rep(1, pop_gd@nLoci), 
-                              segSites = 1:pop_gd@nLoci, allele = 1, 
+      pop_m <- editGenomeFix(pop_m, ind = 1:nGD, chr = rep(1, pop_m@nLoci), 
+                              segSites = 1:pop_m@nLoci, allele = 1, 
                               simParam = simParam)
     }
     
-    pop <- mergePops(list(pop_f, pop_m, pop_gd))
+    pop <- mergePops(list(pop_f, pop_m))
     
     return(pop)
   }
   
-  fertility <- function (pop, strategy = 1){
+  fertility <- function(pop, strategy = 1){
     # If there are no individuals of either sex, the model stops later on
     if ("M" %in% pop@sex) {
       pop_m <- pop[pop@sex == "M"]
@@ -280,19 +277,17 @@ modelHornets <- function(input){
   ## Initialise population ##
   ###########################
   
-  founderPop <- quickHaplo(nInd=(N*2+nGD), nChr=1, segSites=2, genLen = 0)
+  founderPop <- quickHaplo(nInd=((N+nGD)*2), nChr=1, segSites=2, genLen = 0)
   
   SP <- SimParam$new(founderPop)
   SP$addTraitA(nQtlPerChr=2)
   SP$setSexes("yes_sys")
 
   pop <- gdStartPop(founderPop = founderPop, N = N, nGD = nGD, gdSex = gdSex, simParam = SP)
-  crossPlan <- polyandryCross(pop = pop,
-                              femaleMatings = meanFemMatings,
-                              maleMatings = meanMalMatings,
-                              maxFem = maxFemMatings,
-                              maxMal = maxMalMatings,
-                              simParam = SP)
+  crossPlan <- as.data.table(matrix(NA, ncol = 2, nrow = (N+nGD)))
+  setnames(crossPlan, c("Mothers", "Fathers"))
+  crossPlan[, Mothers := pop@id[1:(N+nGD)] ]
+  crossPlan[, Fathers := pop@id[(N+nGD+1):pop@nInd]]
   
   #################################
   ## Setup data collection table ##
@@ -325,6 +320,7 @@ modelHornets <- function(input){
     ## Population dynamics ##
     #########################
     
+    ##### Offspring generation ##### 
     # Remove infertile crosses
     fertiles <- fertility(pop = pop, strategy = strategy)
     queens <- fertiles[fertiles@sex == "F"]
@@ -350,7 +346,6 @@ modelHornets <- function(input){
     queens <- queens[which(queens@id %in% crossPlan$Mothers)]
     drones <- drones[which(drones@id %in% crossPlan$Fathers)]
     
-    ##### Offspring generation ##### 
     # Haploid male offspring
     offspring_m <- maleOffspring(females = queens, 
                                  meanMaleProgeny = meanMalProgeny, 
@@ -363,10 +358,10 @@ modelHornets <- function(input){
                                    simParam = SP)
     pop <- mergePops(list(offspring_m, offspring_f))
     
+    ##### Mating ##### 
     # Gene drive fitness cost
     pop <- heterozygousMortality(pop = pop, pHeteroMort = pHMort)
     
-    ##### Mating ##### 
     # Makes cross plan based on whole population
     crossPlan <- polyandryCross(pop = pop,
                                 femaleMatings = meanFemMatings,
