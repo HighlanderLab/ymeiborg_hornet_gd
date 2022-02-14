@@ -289,6 +289,14 @@ modelHornets <- function(input){
   crossPlan[, Mothers := pop@id[1:(N+nGD)] ]
   crossPlan[, Fathers := pop@id[(N+nGD+1):pop@nInd]]
   
+  if (gdSex = "M") {
+    crossPlan <- crossPlan[((nGD + 1):(nGD + N)), .(Mothers, Fathers)]
+    popMaleGD <- pop[pop@sex == "M"][1:nGD]
+  }
+  
+  queens <- pop[pop@id %in% crossPlan[,Mothers]]
+  drones <- pop[pop@id %in% crossPlan[,Fathers]]
+  
   #################################
   ## Setup data collection table ##
   #################################
@@ -320,36 +328,20 @@ modelHornets <- function(input){
     ## Population dynamics ##
     #########################
     
+    # Save current population numbers
+    Nt <- queens@nInd
+    
     ##### Offspring generation ##### 
-    # Remove infertile crosses
-    fertiles <- fertility(pop = pop, strategy = strategy)
-    queens <- fertiles[fertiles@sex == "F"]
-    drones <- fertiles[fertiles@sex == "M"]
-    
-    if (queens@nInd == 0 | drones@nInd == 0) {  
-      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
-                                                             length((generation + 1):nrow(results)))
-      break
-    }
-    
-    crossPlan <- removeUnsuccessfulCrosses(crosses = crossPlan,
-                                        fertileFemales = queens@id,
-                                        fertileMales = drones@id)
-    
-    if (nrow(crossPlan) == 0) {  
-      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
-                                                             length((generation + 1):nrow(results)))
-      break
-    }
-    
-    # Keep only reproducing individuals
-    queens <- queens[which(queens@id %in% crossPlan$Mothers)]
-    drones <- drones[which(drones@id %in% crossPlan$Fathers)]
-    
     # Haploid male offspring
     offspring_m <- maleOffspring(females = queens, 
                                  meanMaleProgeny = meanMalProgeny, 
                                  simParam = SP)
+    
+    # In case of a male GD, adds the GD carrying males to the WT population
+    if (generation == 1 & gdSex == "M") {
+      offspring_m <- mergePops(list(offspring_m, popMaleGD))
+    } 
+    
     # Diploid female offspring
     offspring_f <- femaleOffspring(females = queens, 
                                    males = drones, 
@@ -376,36 +368,56 @@ modelHornets <- function(input){
       break
     }
     
+    # Remove infertile crosses
+    fertiles <- fertility(pop = pop, strategy = strategy)
+    queens <- fertiles[fertiles@sex == "F"]
+    drones <- fertiles[fertiles@sex == "M"]
+    
+    if (queens@nInd == 0 | drones@nInd == 0) {  
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                                             length((generation + 1):nrow(results)))
+      break
+    }
+    
+    crossPlan <- removeUnsuccessfulCrosses(crosses = crossPlan,
+                                           fertileFemales = queens@id,
+                                           fertileMales = drones@id)
+    
+    if (nrow(crossPlan) == 0) {  
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                                             length((generation + 1):nrow(results)))
+      break
+    }
+    
     ##### Mortality ##### 
     # Density dependent female mortality with logistic function
-    Nt <- queens@nInd
+    
     maxPopSize <- rpois(1, k/(1+((k-Nt)/Nt)*rmax^-1))
-    mortalityRate <- 1-maxPopSize/offspring_f@nInd
+    mortalityRate <- 1-maxPopSize/queens@nInd
     
-    offspring_m <- pop[pop@sex == "M"]
-    offspring_f <- pop[pop@sex == "F"]
+    queens <- mortality(queens, mortalityRate)
     
-    offspring_f <- mortality(offspring_f, mortalityRate)
-    
-    pop <- mergePops(list(offspring_f, offspring_m))
-    
-    if (offspring_f@nInd == 0 | offspring_m@nInd == 0) {
+    if (queens@nInd == 0 | drones@nInd == 0) {
       results[(generation + 1):nrow(results), var[1]] <- rep(0, 
                                                length((generation + 1):nrow(results)))
       break
     }
     
+    # Keep only reproducing individuals
+    queens <- queens[which(queens@id %in% crossPlan$Mothers)]
+    drones <- drones[which(drones@id %in% crossPlan$Fathers)]
+    
     #############################
     ## Track population values ##
     #############################
     
-    haploDF       <- createHaploDF(offspring_f)
+    haploDF       <- createHaploDF(queens)
     countHaplo    <- haploDF[, .N, by = locus1]
     haploDFWider  <- setDT(pivot_wider(haploDF, id_cols = id, 
                                        names_from = haplo, 
                                        names_prefix = "haplo", 
                                        values_from = locus1))
-    popSizeF      <- offspring_f@nInd
+    popSizeF      <- queens@nInd
     WT            <- ifelse(length(countHaplo[locus1 == "WT", N]) > 0, 
                             yes = countHaplo[locus1 == "WT", N]/(popSizeF * 2),
                             no = 0)
