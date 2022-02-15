@@ -289,7 +289,7 @@ modelHornets <- function(input){
   crossPlan[, Mothers := pop@id[1:(N+nGD)] ]
   crossPlan[, Fathers := pop@id[(N+nGD+1):pop@nInd]]
   
-  if (gdSex = "M") {
+  if (gdSex == "M") {
     crossPlan <- crossPlan[((nGD + 1):(nGD + N)), .(Mothers, Fathers)]
     popMaleGD <- pop[pop@sex == "M"][1:nGD]
   }
