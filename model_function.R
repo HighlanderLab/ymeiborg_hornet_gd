@@ -368,7 +368,7 @@ modelHornets <- function(input){
       break
     }
     
-    # Remove infertile crosses
+    # Keep only reproducing individuals
     fertiles <- fertility(pop = pop, strategy = strategy)
     queens <- fertiles[fertiles@sex == "F"]
     drones <- fertiles[fertiles@sex == "M"]
@@ -379,19 +379,8 @@ modelHornets <- function(input){
       break
     }
     
-    crossPlan <- removeUnsuccessfulCrosses(crosses = crossPlan,
-                                           fertileFemales = queens@id,
-                                           fertileMales = drones@id)
-    
-    if (nrow(crossPlan) == 0) {  
-      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
-                                                             length((generation + 1):nrow(results)))
-      break
-    }
-    
     ##### Mortality ##### 
     # Density dependent female mortality with logistic function
-    
     maxPopSize <- rpois(1, k/(1+((k-Nt)/Nt)*rmax^-1))
     mortalityRate <- 1-maxPopSize/queens@nInd
     
@@ -403,9 +392,16 @@ modelHornets <- function(input){
       break
     }
     
-    # Keep only reproducing individuals
-    queens <- queens[which(queens@id %in% crossPlan$Mothers)]
-    drones <- drones[which(drones@id %in% crossPlan$Fathers)]
+    # Remove infertile crosses
+    crossPlan <- removeUnsuccessfulCrosses(crosses = crossPlan,
+                                           fertileFemales = queens@id,
+                                           fertileMales = drones@id)
+    
+    if (nrow(crossPlan) == 0) {  
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                                             length((generation + 1):nrow(results)))
+      break
+    }
     
     #############################
     ## Track population values ##
