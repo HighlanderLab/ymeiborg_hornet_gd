@@ -306,7 +306,7 @@ modelHornets <- function(input){
   results <- array(NA,
                    dim=c(length(generation),length(var)),
                    dimnames=list(generation=generation, var=var))
-  N0 <- pop[pop@sex == "F"]@nInd
+  N0 <- queens@nInd
   results[1, var] <- c(N0,
                        ((N*2)+ifelse(gdSex == "F", nGD, 0))/(N0 * 2), 
                        ifelse(gdSex == "F", nGD/(N0 * 2), 0), 
@@ -379,6 +379,19 @@ modelHornets <- function(input){
       break
     }
     
+    # Remove infertile crosses
+    crossPlan <- removeUnsuccessfulCrosses(crosses = crossPlan,
+                                           fertileFemales = queens@id,
+                                           fertileMales = drones@id)
+    if (nrow(crossPlan) == 0) {  
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                                             length((generation + 1):nrow(results)))
+      break
+    }
+    
+    queens <- queens[queens@id %in% crossPlan$Mothers]
+    drones <- drones[drones@id %in% crossPlan$Fathers]
+    
     ##### Mortality ##### 
     # Density dependent female mortality with logistic function
     maxPopSize <- rpois(1, k/(1+((k-Nt)/Nt)*rmax^-1))
@@ -392,7 +405,7 @@ modelHornets <- function(input){
       break
     }
     
-    # Remove infertile crosses
+    # Remove dead crosses
     crossPlan <- removeUnsuccessfulCrosses(crosses = crossPlan,
                                            fertileFemales = queens@id,
                                            fertileMales = drones@id)
