@@ -18,7 +18,7 @@ input$generations <- 25 #runtime of the simulation
 input$meanFemProgeny <- c(2,11,20,29,38) #average of female progeny per queen
 input$meanMalProgeny <- c(2,11,20,29,38) #average of male progeny per queen
 input$meanFemMatings <- c(0.1,0.15,0.2,0.25,0.3) #average number of times females mate
-input$meanMalMatings <- c(0.1,0.15,0.2,0.25,0.3) #average number of times males mate
+input$meanMalMatings <- c(0.3,0.6,0.9,1.2,1.5) #average number of times males mate
 input$maxFemMatings <- c(1,2,3,4) #maximum number of times females mate
 input$maxMalMatings <- c(1,2,3,4) #maximum number of times males mate
 input$k <- 1000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
