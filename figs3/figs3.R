@@ -34,13 +34,13 @@ input$pHMort <- c(0,0.1) #mortality of gene drive carriers.
 inputs <- expand.grid(input)
 
 inputs <- inputs %>%
-  filter(((meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
-            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2) |
-            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxMalMatings==2) |
-            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.2 & maxFemMatings==2 & maxMalMatings==2) |
+  filter(((meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.9 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.9 & rmax==10 & maxFemMatings==2) |
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.9 & rmax==10 & maxMalMatings==2) |
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & meanMalMatings==0.9 & maxFemMatings==2 & maxMalMatings==2) |
             (meanFemProgeny==20 & meanMalProgeny==20 & meanFemMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
-            (meanFemProgeny==20 & meanMalProgeny==20 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
-            (meanFemProgeny==meanMalProgeny & meanFemMatings==0.2 & meanMalMatings==0.2 & rmax==10 & maxFemMatings==2 & maxMalMatings==2)) &
+            (meanFemProgeny==20 & meanMalProgeny==20 & meanMalMatings==0.9 & rmax==10 & maxFemMatings==2 & maxMalMatings==2) |
+            (meanFemProgeny==meanMalProgeny & meanFemMatings==0.2 & meanMalMatings==0.9 & rmax==10 & maxFemMatings==2 & maxMalMatings==2)) &
            ((pnhej == 0 & cutRate == 1 & pHMort == 0) |
               (pnhej == 0.02 & cutRate == 0.95 & pHMort == 0.1)))
 
@@ -80,7 +80,7 @@ modelOutput <- rowwise(modelOutput) %>%
   mutate(variableRange = case_when(
     meanProgeny != 20 ~ "meanProgeny",
     meanFemMatings != 0.2 ~ "meanFemMatings",
-    meanMalMatings != 0.2 ~ "meanMalMatings",
+    meanMalMatings != 0.9 ~ "meanMalMatings",
     maxFemMatings != 2 ~ "maxFemMatings",
     maxMalMatings != 2 ~ "maxMalMatings",
     rmax != 10 ~ "rmax",
