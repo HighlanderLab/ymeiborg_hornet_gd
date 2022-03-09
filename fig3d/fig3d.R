@@ -62,7 +62,7 @@ fig3d <- ggplot(data = heatMapData) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Nonhomologous endjoining)") +
   ylab("P(GD heterozygote mortality)") +
-  ggtitle("Asian hornet") +
+  ggtitle("European paper wasp") +
   PaperTheme
 fig3d
 
