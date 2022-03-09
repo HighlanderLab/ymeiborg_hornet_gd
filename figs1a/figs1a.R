@@ -12,7 +12,7 @@ source("../model_function.R")
 
 input <- list()
 
-input$repetitions <- 1:10 # number of reps
+input$repetitions <- 1:100 # number of reps
 input$generations <- 25 #runtime of the simulation
 
 input$meanFemProgeny <- 300 #average of femlae progeny per queen
