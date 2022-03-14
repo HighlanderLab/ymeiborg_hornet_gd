@@ -82,24 +82,24 @@ modelOutput <- mutate(modelOutput,
                         rmax = factor(rmax),
                         generations = factor(generations),
                         repetitions = factor(repetitions),
-                      pHMort = factor(pHMort),
+                        pHMort = factor(pHMort),
                         pHMort = factor(pHMort))
 
 haploRep <- as_tibble(modelOutput) %>% 
   select(strategy, gdSex, generation, repetitions, WT:RE, N, nGD, k) %>% 
   pivot_longer(cols = WT:RE) %>% 
-  rename("Introduction sex" = gdSex, Allele = name, Frequency = value)
+  rename("Release" = gdSex, Allele = name, Frequency = value)
 
 haploRep$strategy = factor(haploRep$strategy, 
                            levels = c(1,2,3,4),
                            labels = c("Neutral","Male infertility","Female infertility", "Both-sex infertility"))
-haploRep$`Introduction sex` = factor(haploRep$`Introduction sex`, 
+haploRep$`Release` = factor(haploRep$`Release`, 
                            levels = c(1,2),
-                           labels = c("Female","Male"))
+                           labels = c("Females","Males"))
 
 fig2a <- ggplot(data = haploRep) +
   facet_grid(
-    `Introduction sex` ~ strategy,
+    `Release` ~ strategy,
     scales = "fixed",
     labeller = labeller(.cols = label_value, .rows = label_both)
   ) +
@@ -109,7 +109,8 @@ fig2a <- ggplot(data = haploRep) +
     group = interaction(Allele, repetitions),
     colour = Allele
   )) +
-  scale_colour_manual(values=met.brewer("Greek", 4)) +
+  scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
+                                   alpha = 0.1)) +
   xlab("Generation") +
   ggtitle("Asian hornet") +
   PaperTheme
@@ -128,6 +129,6 @@ save(modelOutput, fig2a, file = "Fig2a.Rdata")
 ###################
 
 haploRepSD <- filter(haploRep, strategy == "Neutral" | strategy == "Female infertility", generation == 7) %>%
-  group_by(strategy, `Introduction sex`, Allele) %>%
+  group_by(strategy, `Release`, Allele) %>%
   summarise(mean = mean(Frequency), sd = sd(Frequency)) %>%
   filter(Allele == "GD")
