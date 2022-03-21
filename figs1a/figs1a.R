@@ -111,7 +111,7 @@ figs1a <- ggplot(data = haploRep) +
   scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
                                      alpha = 0.1)) +
   xlab("Generation") +
-  labs(title = "Asian hornet") +
+  ggtitle("Asian hornet") +
   PaperTheme
 figs1a
 

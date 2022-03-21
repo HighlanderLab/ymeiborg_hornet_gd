@@ -112,7 +112,7 @@ figs1b <- ggplot(data = haploRep) +
   scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
                                      alpha = 0.1)) +
   xlab("Generation") +
-  labs(title = "European paper wasp") +
+  ggtitle("European paper wasp") +
   PaperTheme
 figs1b
 
