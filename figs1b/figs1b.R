@@ -88,18 +88,18 @@ modelOutput <- mutate(modelOutput,
 haploRep <- as_tibble(modelOutput) %>% 
   select(strategy, gdSex, generation, repetitions, WT:RE, N, nGD, k) %>% 
   pivot_longer(cols = WT:RE) %>% 
-  rename("Introduction sex" = gdSex, Allele = name, Frequency = value)
+  rename("Release" = gdSex, Allele = name, Frequency = value)
 
 haploRep$strategy = factor(haploRep$strategy, 
                            levels = c(1,2,3,4),
                            labels = c("Neutral","Male infertility","Female infertility","Both-sex infertility"))
-haploRep$`Introduction sex` = factor(haploRep$`Introduction sex`, 
+haploRep$`Release` = factor(haploRep$`Release`, 
                            levels = c(1,2),
-                           labels = c("Female","Male"))
+                           labels = c("Females","Males"))
 
 figs1b <- ggplot(data = haploRep) +
   facet_grid(
-    `Introduction sex` ~ strategy,
+    `Release` ~ strategy,
     scales = "fixed",
     labeller = labeller(.cols = label_value, .rows = label_both)
   ) +
@@ -109,7 +109,8 @@ figs1b <- ggplot(data = haploRep) +
     group = interaction(Allele, repetitions),
     colour = Allele
   )) +
-  scale_colour_manual(values=met.brewer("Greek", 4)) +
+  scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
+                                     alpha = 0.1)) +
   xlab("Generation") +
   labs(title = "European paper wasp") +
   PaperTheme
@@ -118,3 +119,12 @@ figs1b
 ggsave(plot = figs1b, filename = "FigS1b.png", height = 12, width = 20, unit = "cm")
 
 save(modelOutput, figs1b, file = "FigS1b.Rdata")
+
+###################
+##### Get SD ######
+###################
+
+haploRepSD <- filter(haploRep, strategy == "Neutral" | strategy == "Female infertility", generation == 7) %>%
+  group_by(strategy, `Release`, Allele) %>%
+  summarise(mean = mean(Frequency), sd = sd(Frequency)) %>%
+  filter(Allele == "GD")
