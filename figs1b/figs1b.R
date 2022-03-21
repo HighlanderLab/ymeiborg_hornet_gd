@@ -64,7 +64,7 @@ save(modelOutput, file = "FigS1b.Rdata")
 PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
-        title=element_text(size=12, hjust=0.5),
+        title=element_text(size=14, hjust=0.5),
         legend.title=element_text(size=12),
         legend.position = "bottom",
         legend.justification = "center",
@@ -116,15 +116,11 @@ figs1b <- ggplot(data = haploRep) +
   PaperTheme
 figs1b
 
+#########################################
+########## Save model ###################
+#########################################
+
 ggsave(plot = figs1b, filename = "FigS1b.png", height = 12, width = 20, unit = "cm")
 
 save(modelOutput, figs1b, file = "FigS1b.Rdata")
 
-###################
-##### Get SD ######
-###################
-
-haploRepSD <- filter(haploRep, strategy == "Neutral" | strategy == "Female infertility", generation == 7) %>%
-  group_by(strategy, `Release`, Allele) %>%
-  summarise(mean = mean(Frequency), sd = sd(Frequency)) %>%
-  filter(Allele == "GD")

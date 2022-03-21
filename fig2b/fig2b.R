@@ -116,15 +116,10 @@ fig2b <- ggplot(data = haploRep) +
   PaperTheme
 fig2b
 
+#########################################
+########## Save model ###################
+#########################################
+
 ggsave(plot = fig2b, filename = "Fig2b.png", height = 12, width = 20, unit = "cm")
 
 save(modelOutput, fig2b, file = "Fig2b.Rdata")
-
-###################
-##### Get SD ######
-###################
-
-haploRepSD <- filter(haploRep, strategy == "Neutral" | strategy == "Female infertility", generation == 7) %>%
-  group_by(strategy, `Release`, Allele) %>%
-  summarise(mean = mean(Frequency), sd = sd(Frequency)) %>%
-  filter(Allele == "GD")
