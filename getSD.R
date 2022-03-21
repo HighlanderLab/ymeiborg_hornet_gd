@@ -1,4 +1,4 @@
-setwd(/scratch/bell/ymeiborg)
+setwd("/scratch/bell/ymeiborg")
 source("./model_function.R")
 
 load("fig2a/Fig2a.Rdata")

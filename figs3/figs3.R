@@ -135,7 +135,7 @@ p1 <- ggplot(data = suppressed) +
   facet_wrap(. ~ name, scales = "free_x") +
   geom_line(aes(x = value, y = suppressionRate, colour = name)) +
   geom_point(aes(x = value, y = suppressionRate, colour = name)) +
-  scale_colour_manual(values=met.brewer("Greek", 6)) +
+  scale_colour_manual(values=rep("black",6)) +
   ylim(c(0,1)) +
   ylab("Suppression rate") +
   xlab("Parameter value") + 
@@ -186,7 +186,7 @@ p2 <- ggplot(data = lastGenStatsRealistic) +
   ylim(c(0,25)) +
   ylab("Last viable generation") +
   xlab("Parameter value") +
-  scale_colour_manual(values=met.brewer("Greek", 6)) +
+  scale_colour_manual(values=rep("black",6)) +
   PaperTheme +
   ggtitle("Realistic gene drive")
 p2
@@ -218,7 +218,7 @@ p3 <- ggplot(data = suppressed) +
   facet_wrap(. ~ name, scales = "free_x") +
   geom_line(aes(x = value, y = suppressionRate, colour = name)) +
   geom_point(aes(x = value, y = suppressionRate, colour = name)) +
-  scale_colour_manual(values=met.brewer("Greek", 6)) +
+  scale_colour_manual(values=rep("black",6)) +
   ylim(c(0,1)) +
   ylab("Suppression rate") +
   xlab("Parameter value") + 
@@ -269,7 +269,7 @@ p4 <- ggplot(data = lastGenStatsOptimal) +
   ylim(c(0,25)) +
   ylab("Last viable generation") +
   xlab("Parameter value") +
-  scale_colour_manual(values=met.brewer("Greek", 6)) +
+  scale_colour_manual(values=rep("black",6)) +
   PaperTheme +
   ggtitle("Optimal gene drive")
 p4
