@@ -64,7 +64,7 @@ save(modelOutput, file = "FigS1a.Rdata")
 PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
-        title=element_text(size=12, hjust=0.5), 
+        title=element_text(size=14, hjust=0.5), 
         legend.title=element_text(size=12),
         legend.position = "bottom", 
         legend.justification = "center",
@@ -109,21 +109,16 @@ figs1a <- ggplot(data = haploRep) +
     colour = Allele
   )) +
   scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
-                                     alpha = 0.1)) +
+                                     alpha = 0.15)) +
   xlab("Generation") +
-  labs(title = "Asian hornet") +
+  ggtitle("Asian hornet") +
   PaperTheme
 figs1a
+
+#########################################
+########## Save model ###################
+#########################################
 
 ggsave(plot = figs1a, filename = "FigS1a.png", height = 12, width = 20, unit = "cm")
 
 save(modelOutput, figs1a, file = "FigS1a.Rdata")
-
-###################
-##### Get SD ######
-###################
-
-haploRepSD <- filter(haploRep, strategy == "Neutral" | strategy == "Female infertility", generation == 7) %>%
-  group_by(strategy, `Release`, Allele) %>%
-  summarise(mean = mean(Frequency), sd = sd(Frequency)) %>%
-  filter(Allele == "GD")
