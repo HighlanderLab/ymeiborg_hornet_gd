@@ -5,14 +5,14 @@
 #SBATCH -A bharpur # partition name
 #SBATCH -N 1 # number of nodes
 #SBATCH -n 9 # number of cores
-#SBATCH -t 5-00:00:00
+#SBATCH -t 3-00:00:00
 #SBATCH --mem=50000 # memory
 #SBATCH -o job_out_7_2  # assign standard output file name
 #SBATCH -e job_err_7_2  # assign standard error file name
 #SBATCH --mail-type=end,fail # email you when begin, end, fail, requeue
 #SBATCH --mail-user=ymeiborg@purdue.edu # email address
 
-module load r/4.0.0 # load_2.R 
+module load r/4.0.0 # load R 
 
 echo "Beginning_2.jobbo"
 
