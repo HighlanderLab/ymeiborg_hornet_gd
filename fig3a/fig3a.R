@@ -64,5 +64,6 @@ fig3a <- ggplot(data = heatMapData) +
   PaperTheme
 fig3a
 
+save(fig3a, file = "Fig3a.Rdata")
 ggsave(plot = fig3a, filename = "Fig3a.png", height = 11, width = 10, unit = "cm")
 
