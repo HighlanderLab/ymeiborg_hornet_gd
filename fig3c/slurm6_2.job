@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #FILENAME: slurm6_2.job
-#SBATCH -J hornet_fig3c_6_2 #_2.job name
+#SBATCH -J hornet_fig3c_6_2 # job name
 #SBATCH -A bharpur # partition name
 #SBATCH -N 1 # number of nodes
 #SBATCH -n 9 # number of cores
 #SBATCH -t 5-00:00:00
 #SBATCH --mem=50000 # memory
-#SBATCH -o_2.job_out_6_2  # assign standard output file name
-#SBATCH -e_2.job_err_6_2  # assign standard error file name
+#SBATCH -o job_out_6_2  # assign standard output file name
+#SBATCH -e job_err_6_2  # assign standard error file name
 #SBATCH --mail-type=end,fail # email you when begin, end, fail, requeue
 #SBATCH --mail-user=ymeiborg@purdue.edu # email address
 
