@@ -77,9 +77,7 @@ modelOutput <- mutate(modelOutput,
                         gdSex = factor(gdSex),
                         rmax = factor(rmax),
                         generations = factor(generations),
-                        repetitions = factor(repetitions),
-                        pHMort = factor(pHMort),
-                        cutRate = factor(cutRate))
+                        repetitions = factor(repetitions))
 
 heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popSizeF) %>%
   filter(generation == max(generation)) %>%
