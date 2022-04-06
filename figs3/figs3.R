@@ -293,9 +293,12 @@ lastGenStatsMid <- lastGenStatsMid[order(lastGenStatsMid$name),] %>%
 ################## combine data ##################
 
 suppressed <- bind_rows(suppressedRealistic, suppressedOptimal, suppressedMid) %>%
-  mutate(condition)
+  mutate(condition = factor(condition, levels = c("Optimal", "Intermediate", "Realistic"),
+                            labels = c("Optimal", "Intermediate", "Realistic")))
 
-lastGenStats <- bind_rows(lastGenStatsRealistic, lastGenStatsOptimal, lastGenStatsMid)
+lastGenStats <- bind_rows(lastGenStatsRealistic, lastGenStatsOptimal, lastGenStatsMid) %>%
+  mutate(condition = factor(condition, levels = c("Optimal", "Intermediate", "Realistic"),
+                            labels = c("Optimal", "Intermediate", "Realistic")))
 
 ################## plots ##################
 
