@@ -113,25 +113,24 @@ year25mid$paramSet <- factor(year25mid$paramSet)
 
 suppressedRealistic <- rowwise(year25realistic) %>%
   mutate(suppressedRealistic = case_when(popSizeF == 0 ~ 1,
-                                popSizeF > 0 ~ 0)) %>%
+                                         popSizeF > 0 ~ 0)) %>%
   group_by(paramSet) %>%
   mutate(suppressionRate = sum(suppressedRealistic)/10) %>%
   distinct(paramSet, .keep_all = TRUE) %>%
   select(paramSet, meanProgeny:maxMalMatings, rmax, suppressionRate, variableRange) %>%
   pivot_longer(cols = meanProgeny:rmax) %>%
   filter(variableRange == name | variableRange == "default") %>%
-  mutate(name = factor(name), cond = "opt") %>%
+  mutate(name = factor(name), condition = "Realistic") %>%
   arrange(name)
 
 suppressedRealistic$name <- factor(suppressedRealistic$name, 
-                          levels = c('rmax','meanFemMatings','meanMalMatings',
-                                     'maxFemMatings','maxMalMatings',
-                                     'meanProgeny', 'default'), 
-                          labels = c('Max growth rate','Mean female matings','Mean male matings',
-                                     'Max female matings','Max male matings',
-                                     'Mean progeny', 'Default'))
-suppressedRealistic <- suppressedRealistic[order(suppressedRealistic$name),] %>%
-  mutate(condition = "Realistic")
+                                   levels = c('rmax','meanFemMatings','meanMalMatings',
+                                              'maxFemMatings','maxMalMatings',
+                                              'meanProgeny', 'default'), 
+                                   labels = c('Max growth rate','Mean female matings','Mean male matings',
+                                              'Max female matings','Max male matings',
+                                              'Mean progeny', 'Default'))
+suppressedRealistic <- suppressedRealistic[order(suppressedRealistic$name),]
 
 modelOutputRealistic$paramSet <- rep(1:ntimes, each = nrow(modelOutputRealistic)/ntimes)
 modelOutputRealistic$paramSet <- factor(modelOutputRealistic$paramSet)
@@ -146,7 +145,7 @@ lastGenStatsRealistic <- group_by(lastGenRealistic, paramSet) %>%
             semLastGen = sd(generation)/sqrt(10)) 
 
 lastGenStatsRealistic <- left_join(x = lastGenStatsRealistic, 
-                                 y = lastGenRealistic, by = "paramSet") %>%
+                                   y = lastGenRealistic, by = "paramSet") %>%
   distinct(paramSet, .keep_all = TRUE) %>%
   select(paramSet:semLastGen, meanProgeny:rmax, -k, variableRange) %>%
   pivot_longer(cols = meanProgeny:rmax) %>%
@@ -174,27 +173,24 @@ lastGenStatsRealistic <- lastGenStatsRealistic[order(lastGenStatsRealistic$name)
 
 suppressedOptimal <- rowwise(year25optimal) %>%
   mutate(suppressedOptimal = case_when(popSizeF == 0 ~ 1,
-                                popSizeF > 0 ~ 0)) %>%
+                                       popSizeF > 0 ~ 0)) %>%
   group_by(paramSet) %>%
   mutate(suppressionRate = sum(suppressedOptimal)/10) %>%
   distinct(paramSet, .keep_all = TRUE) %>%
   select(paramSet, meanProgeny:maxMalMatings, rmax, suppressionRate, variableRange) %>%
   pivot_longer(cols = meanProgeny:rmax) %>%
   filter(variableRange == name | variableRange == "default") %>%
-  mutate(name = factor(name), cond = "opt") %>%
+  mutate(name = factor(name), condition = "Optimal") %>%
   arrange(name)
 
 suppressedOptimal$name <- factor(suppressedOptimal$name, 
-                          levels = c('rmax','meanFemMatings','meanMalMatings',
-                                     'maxFemMatings','maxMalMatings',
-                                     'meanProgeny', 'default'), 
-                          labels = c('Max growth rate','Mean female matings','Mean male matings',
-                                     'Max female matings','Max male matings',
-                                     'Mean progeny', 'Default'))
-suppressedOptimal <- suppressedOptimal[order(suppressedOptimal$name),] %>%
-  mutate(condition = "Optimal")
-
-
+                                 levels = c('rmax','meanFemMatings','meanMalMatings',
+                                            'maxFemMatings','maxMalMatings',
+                                            'meanProgeny', 'default'), 
+                                 labels = c('Max growth rate','Mean female matings','Mean male matings',
+                                            'Max female matings','Max male matings',
+                                            'Mean progeny', 'Default'))
+suppressedOptimal <- suppressedOptimal[order(suppressedOptimal$name),]
 
 modelOutputOptimal$paramSet <- rep(1:ntimes, each = nrow(modelOutputOptimal)/ntimes)
 modelOutputOptimal$paramSet <- factor(modelOutputOptimal$paramSet)
@@ -209,7 +205,7 @@ lastGenStatsOptimal <- group_by(lastGenOptimal, paramSet) %>%
             semLastGen = sd(generation)/sqrt(10)) 
 
 lastGenStatsOptimal <- left_join(x = lastGenStatsOptimal, 
-                             y = lastGenOptimal, by = "paramSet") %>%
+                                 y = lastGenOptimal, by = "paramSet") %>%
   distinct(paramSet, .keep_all = TRUE) %>%
   select(paramSet:semLastGen, meanProgeny:rmax, -k, variableRange) %>%
   pivot_longer(cols = meanProgeny:rmax) %>%
@@ -237,30 +233,29 @@ lastGenStatsOptimal <- lastGenStatsOptimal[order(lastGenStatsOptimal$name),] %>%
 
 suppressedMid <- rowwise(year25mid) %>%
   mutate(suppressedMid = case_when(popSizeF == 0 ~ 1,
-                                popSizeF > 0 ~ 0)) %>%
+                                   popSizeF > 0 ~ 0)) %>%
   group_by(paramSet) %>%
   mutate(suppressionRate = sum(suppressedMid)/10) %>%
   distinct(paramSet, .keep_all = TRUE) %>%
   select(paramSet, meanProgeny:maxMalMatings, rmax, suppressionRate, variableRange) %>%
   pivot_longer(cols = meanProgeny:rmax) %>%
   filter(variableRange == name | variableRange == "default") %>%
-  mutate(name = factor(name), cond = "opt") %>%
+  mutate(name = factor(name), condition = "Intermediate") %>%
   arrange(name)
 
 suppressedMid$name <- factor(suppressedMid$name, 
-                          levels = c('rmax','meanFemMatings','meanMalMatings',
-                                     'maxFemMatings','maxMalMatings',
-                                     'meanProgeny', 'default'), 
-                          labels = c('Max growth rate','Mean female matings','Mean male matings',
-                                     'Max female matings','Max male matings',
-                                     'Mean progeny', 'Default'))
-suppressedMid <- suppressedMid[order(suppressedMid$name),] %>%
-  mutate(condition = "Intermediate")
+                             levels = c('rmax','meanFemMatings','meanMalMatings',
+                                        'maxFemMatings','maxMalMatings',
+                                        'meanProgeny', 'default'), 
+                             labels = c('Max growth rate','Mean female matings','Mean male matings',
+                                        'Max female matings','Max male matings',
+                                        'Mean progeny', 'Default'))
+suppressedMid <- suppressedMid[order(suppressedMid$name),]
 
-modelOutputRealistic$paramSet <- rep(1:ntimes, each = nrow(modelOutputRealistic)/ntimes)
-modelOutputRealistic$paramSet <- factor(modelOutputRealistic$paramSet)
+modelOutputMid$paramSet <- rep(1:ntimes, each = nrow(modelOutputMid)/ntimes)
+modelOutputMid$paramSet <- factor(modelOutputMid$paramSet)
 
-lastGenMid <- lastGenMid %>%
+lastGenMid <- modelOutputMid %>%
   filter(popSizeF != 0) %>%
   group_by(paramSet, repetitions) %>%
   filter(generation == max(generation))
@@ -270,7 +265,7 @@ lastGenStatsMid <- group_by(lastGenMid, paramSet) %>%
             semLastGen = sd(generation)/sqrt(10)) 
 
 lastGenStatsMid <- left_join(x = lastGenStatsMid, 
-                                   y = lastGenMid, by = "paramSet") %>%
+                             y = lastGenMid, by = "paramSet") %>%
   distinct(paramSet, .keep_all = TRUE) %>%
   select(paramSet:semLastGen, meanProgeny:rmax, -k, variableRange) %>%
   pivot_longer(cols = meanProgeny:rmax) %>%
@@ -296,9 +291,13 @@ lastGenStatsMid <- lastGenStatsMid[order(lastGenStatsMid$name),] %>%
 
 ################## combine data ##################
 
-suppressed <- bind_rows(suppressedRealistic, suppressedOptimal, suppressedMid)
+suppressed <- bind_rows(suppressedRealistic, suppressedOptimal, suppressedMid) %>%
+  mutate(condition = factor(condition, levels = c("Optimal", "Intermediate", "Realistic"),
+                            labels = c("Optimal", "Intermediate", "Realistic")))
 
-lastGenStats <- bind_rows(lastGenStatsRealistic, lastGenStatsOptimal, lastGenStatsMid)
+lastGenStats <- bind_rows(lastGenStatsRealistic, lastGenStatsOptimal, lastGenStatsMid) %>%
+  mutate(condition = factor(condition, levels = c("Optimal", "Intermediate", "Realistic"),
+                            labels = c("Optimal", "Intermediate", "Realistic")))
 
 ################## plots ##################
 
