@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #FILENAME: slurm2_4.job
-#SBATCH -J hornet_fig3c_4_4 # job name
+#SBATCH -J hornet_fig3c_2_4 # job name
 #SBATCH -A bharpur # partition name
 #SBATCH -N 1 # number of nodes
 #SBATCH -n 9 # number of cores
