@@ -16,6 +16,6 @@ module load r/4.0.0 # load R
 
 echo "Beginning_4.jobbo"
 
-Rscript fig3c_4_4.R
+Rscript fig3c_2_4.R
 
 echo "Done with_4.jobbo"
