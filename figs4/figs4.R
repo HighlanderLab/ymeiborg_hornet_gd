@@ -66,38 +66,134 @@ save(modelOutput, file = "FigS4.Rdata")
 
 #################### Prepare data ##################
 
-# modelOutput <- as_tibble(modelOutput)
-# 
-# modelOutput <- rowwise(modelOutput) %>% 
-#   select(-meanMalProgeny) %>%
-#   rename(meanProgeny = meanFemProgeny) %>%
-#   mutate(condition = case_when(
-#     maxFemMatings == 2 ~ "European Paper Wasp",
-#     maxFemMatings == 4 ~ "Asian Hornet",
-#   ))
-# 
-# PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
-#   theme(strip.background = element_blank(),
-#         panel.grid = element_blank(),
-#         title=element_text(size=14, hjust=0.5), 
-#         plot.title=element_text(size=14, hjust=0.5),
-#         axis.title=element_text(size=12))
-# 
-# modelOutputOptimal <- filter(modelOutput, cutRate == 1)
-# modelOutputRealistic <- filter(modelOutput, cutRate == 0.95)
-# modelOutputMid <- filter(modelOutput, cutRate == 0.97)
-# 
-# year25optimal <- filter(modelOutputOptimal, generation == 25)
-# year25realistic <- filter(modelOutputRealistic, generation == 25)
-# year25mid<- filter(modelOutputMid, generation == 25)
-# 
-# ntimes <- nrow(year25optimal)/max(inputs$repetitions)
-# year25optimal$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
-# year25optimal$paramSet <- factor(year25optimal$paramSet)
-# year25realistic$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
-# year25realistic$paramSet <- factor(year25realistic$paramSet)
-# year25mid$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
-# year25mid$paramSet <- factor(year25mid$paramSet)
+modelOutput <- as_tibble(modelOutput)
+
+modelOutput <- rowwise(modelOutput) %>%
+  select(-meanMalProgeny) %>%
+  rename(meanProgeny = meanFemProgeny) %>%
+  mutate(species = case_when(
+    maxFemMatings == 2 ~ "European Paper Wasp",
+    maxFemMatings == 4 ~ "Asian Hornet",
+  ))
+
+PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        title=element_text(size=14, hjust=0.5),
+        plot.title=element_text(size=14, hjust=0.5),
+        axis.title=element_text(size=12))
+
+modelOutputOptimal <- filter(modelOutput, cutRate == 1)
+modelOutputRealistic <- filter(modelOutput, cutRate == 0.95)
+modelOutputMid <- filter(modelOutput, cutRate == 0.97)
+
+year25optimal <- filter(modelOutputOptimal, generation == 25)
+year25realistic <- filter(modelOutputRealistic, generation == 25)
+year25mid<- filter(modelOutputMid, generation == 25)
+ 
+ntimes <- nrow(year25optimal)/max(inputs$repetitions)
+year25optimal$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
+year25optimal$paramSet <- factor(year25optimal$paramSet)
+year25realistic$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
+year25realistic$paramSet <- factor(year25realistic$paramSet)
+year25mid$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
+year25mid$paramSet <- factor(year25mid$paramSet)
+
+modelOutputRealistic$paramSet <- rep(1:ntimes, each = nrow(modelOutputRealistic)/ntimes)
+modelOutputRealistic$paramSet <- factor(modelOutputRealistic$paramSet)
+modelOutputOptimal$paramSet <- rep(1:ntimes, each = nrow(modelOutputOptimal)/ntimes)
+modelOutputOptimal$paramSet <- factor(modelOutputOptimal$paramSet)
+modelOutputMid$paramSet <- rep(1:ntimes, each = nrow(modelOutputMid)/ntimes)
+modelOutputMid$paramSet <- factor(modelOutputMid$paramSet)
 
 ################## Realistic GD scenario ##################
 
+lastGenRealistic <- modelOutputRealistic %>%
+  filter(popSizeF != 0) %>%
+  group_by(paramSet, repetitions) %>%
+  filter(generation == max(generation))
+
+lastGenStatsRealistic <- group_by(lastGenRealistic, paramSet) %>%
+  summarise(mLastGen = mean(generation),
+            semLastGen = sd(generation)/sqrt(10)) 
+
+lastGenStatsRealistic <- left_join(x = lastGenStatsRealistic, 
+                                   y = lastGenRealistic, by = "paramSet") %>%
+  distinct(paramSet, .keep_all = TRUE) %>%
+  select(paramSet:semLastGen, meanProgeny, species) %>%
+  pivot_longer(cols = meanProgeny) %>%
+  mutate(name = factor(name, levels = c('meanProgeny', 'species'), 
+                       labels = c('Mean progeny', 'Species')),
+         lower = mLastGen - semLastGen,
+         upper = mLastGen + semLastGen,
+         condition = "Realistic")
+
+################## Mid GD scenario ##################
+
+lastGenMid <- modelOutputMid %>%
+  filter(popSizeF != 0) %>%
+  group_by(paramSet, repetitions) %>%
+  filter(generation == max(generation))
+
+lastGenStatsMid <- group_by(lastGenMid, paramSet) %>%
+  summarise(mLastGen = mean(generation),
+            semLastGen = sd(generation)/sqrt(10)) 
+
+lastGenStatsMid <- left_join(x = lastGenStatsMid, 
+                                   y = lastGenMid, by = "paramSet") %>%
+  distinct(paramSet, .keep_all = TRUE) %>%
+  select(paramSet:semLastGen, meanProgeny, species) %>%
+  pivot_longer(cols = meanProgeny) %>%
+  mutate(name = factor(name, levels = c('meanProgeny', 'species'), 
+                       labels = c('Mean progeny', 'Species')),
+         lower = mLastGen - semLastGen,
+         upper = mLastGen + semLastGen,
+         condition = "Intermediate")
+
+################## Optimal GD scenario ##################
+
+lastGenOptimal <- modelOutputOptimal %>%
+  filter(popSizeF != 0) %>%
+  group_by(paramSet, repetitions) %>%
+  filter(generation == max(generation))
+
+lastGenStatsOptimal <- group_by(lastGenOptimal, paramSet) %>%
+  summarise(mLastGen = mean(generation),
+            semLastGen = sd(generation)/sqrt(10)) 
+
+lastGenStatsOptimal <- left_join(x = lastGenStatsOptimal, 
+                             y = lastGenOptimal, by = "paramSet") %>%
+  distinct(paramSet, .keep_all = TRUE) %>%
+  select(paramSet:semLastGen, meanProgeny, species) %>%
+  pivot_longer(cols = meanProgeny) %>%
+  mutate(name = factor(name, levels = c('meanProgeny', 'species'), 
+                       labels = c('Mean progeny', 'Species')),
+         lower = mLastGen - semLastGen,
+         upper = mLastGen + semLastGen,
+         condition = "Optimal")
+
+################## combine data ##################
+
+lastGenStats <- bind_rows(lastGenStatsRealistic, lastGenStatsOptimal, lastGenStatsMid) %>%
+  mutate(condition = factor(condition, levels = c("Optimal", "Intermediate", "Realistic"),
+                            labels = c("Optimal", "Intermediate", "Realistic")))
+
+################## Plots ##################
+
+p1 <- ggplot(data = lastGenStats) +
+  facet_wrap(. ~ species, scales = "fixed") +
+  geom_line(aes(x = log2(value), y = mLastGen, colour = condition)) +
+  geom_point(aes(x = log2(value), y = mLastGen, colour = condition)) +
+  geom_errorbar(aes(x = log2(value), y = mLastGen, ymin = lower, ymax = upper), 
+                size = 0.1, width = 0.1) +
+  scale_colour_manual(values=met.brewer("Greek", n = length(unique(lastGenStats$condition))),
+                      name = "Gene Drive Conditions") +
+  ylim(c(0,25)) +
+  ylab("Last viable generation") +
+  xlab("Mean progeny size (log2)") +
+  scale_x_continuous(breaks = seq(0, 10, 2), limits = c(0, 10)) +
+  PaperTheme +
+  theme(strip.text.x = element_text(size = 12, face = "bold"), legend.position = "bottom")
+p1
+
+ggsave(filename = "FigS4.png", plot = p1, height = 25, width = 20, unit = "cm")
