@@ -196,4 +196,4 @@ p1 <- ggplot(data = lastGenStats) +
   theme(strip.text.x = element_text(size = 12, face = "bold"), legend.position = "bottom")
 p1
 
-ggsave(filename = "FigS4.png", plot = p1, height = 25, width = 20, unit = "cm")
+ggsave(filename = "FigS4.png", plot = p1, height = 10, width = 20, unit = "cm")
