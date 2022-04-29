@@ -186,12 +186,19 @@ p1 <- ggplot(data = lastGenStats) +
   geom_point(aes(x = log2(value), y = mLastGen, colour = condition)) +
   geom_errorbar(aes(x = log2(value), y = mLastGen, ymin = lower, ymax = upper), 
                 size = 0.1, width = 0.1) +
+  geom_linerange(data = tibble(species = c("Asian Hornet", "European Paper Wasp"), 
+                               `Mean progeny` = c(300, 20),
+                               `Last viable generation` = c(15, 15),
+                               ymin = c(15, 13), ymax = c(25, 25),
+                               xmin = c(300, 20), xmax = c(300, 20)),
+                 aes(x = log2(`Mean progeny`), y = `Last viable generation`, 
+                     ymin = ymin, ymax = ymax, 
+                     xmin = log2(xmin), xmax = log2(xmax)), colour = "red", linetype = "b") +
   scale_colour_manual(values=met.brewer("Greek", n = length(unique(lastGenStats$condition))),
                       name = "Gene Drive Conditions") +
   ylim(c(0,25)) +
   ylab("Last viable generation") +
   xlab("Mean progeny size (log2)") +
-  scale_x_continuous(breaks = seq(0, 10, 2), limits = c(0, 10)) +
   PaperTheme +
   theme(strip.text.x = element_text(size = 12, face = "bold"), legend.position = "bottom")
 p1
