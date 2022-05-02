@@ -25,7 +25,7 @@ input$N <- 1000 #size of start WT population
 input$gdSex <- "F" #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
-input$pnhej <- seq(0.011, 0.2, 0.001) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
+input$pnhej <- seq(0.011, 0.02, 0.001) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
 input$cutRate <- 1 #probability CRISPR cuts the opposite DNA strand
 input$pHMort <- seq(0, 0.25, 0.025) #mortality of gene drive carriers.
 inputs <- expand.grid(input)
