@@ -2,7 +2,7 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/fig2b")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig2b")
 
 source("../model_function.R")
 
