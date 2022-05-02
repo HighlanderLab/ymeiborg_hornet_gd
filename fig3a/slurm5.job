@@ -5,7 +5,7 @@
 #SBATCH -A bharpur # partition name
 #SBATCH -N 1 # number of nodes
 #SBATCH -n 9 # number of cores
-#SBATCH -t 3-00:00:00
+#SBATCH -t 5-00:00:00
 #SBATCH --mem=50000 # memory
 #SBATCH -o job_out_5 # assign standard output file name
 #SBATCH -e job_err_5 # assign standard error file name
