@@ -111,6 +111,7 @@ fig2a <- ggplot(data = haploRep) +
   )) +
   scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
                                    alpha = 0.15)) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1))) +
   xlab("Generation") +
   ggtitle("Asian hornet") +
   PaperTheme
