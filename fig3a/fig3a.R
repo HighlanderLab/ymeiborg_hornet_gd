@@ -56,9 +56,11 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popS
 fig3a <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = cutRate, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
+  geom_point(aes(x = 0, y = 0.97, colour = "red")) +
   xlab("P(Nonhomologous endjoining)") +
   ylab("P(Cutting)") +
   ggtitle("Asian hornet") +
+  guides(col = "none") +
   PaperTheme
 fig3a
 

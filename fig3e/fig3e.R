@@ -58,9 +58,11 @@ heatMapData <- select(modelOutput, generation, repetitions, cutRate, pHMort, pop
 fig3e <- ggplot(data = heatMapData) +
   geom_raster(aes(x = cutRate, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
+  geom_point(aes(x = 0.97, y = 0.15, colour = "red")) +
   xlab("P(Cutting)") +
   ylab("P(GD heterozygote mortality)") +
   ggtitle("Asian hornet") +
+  guides(col = "none") +
   PaperTheme
 fig3e
 

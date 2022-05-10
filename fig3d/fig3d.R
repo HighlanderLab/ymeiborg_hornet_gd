@@ -58,9 +58,11 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, pHMort, popSi
 fig3d <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
+  geom_point(aes(x = 0, y = 0.15, colour = "red")) +
   xlab("P(Nonhomologous endjoining)") +
   ylab("P(GD heterozygote mortality)") +
   ggtitle("European paper wasp") +
+  guides(col = "none") +
   PaperTheme
 fig3d
 
