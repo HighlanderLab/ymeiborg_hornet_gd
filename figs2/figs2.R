@@ -44,29 +44,20 @@ inputs <- inputs %>%
              (pnhej == 0.02 & cutRate == 0.95 & pHMort == 0.1) |
              (pnhej == 0 & cutRate == 0.97 & pHMort == 0.15)))
 
-#########################################
-########## Run model ####################
-#########################################
+#################### Load data #####################
 
-# Track population information
-generation <- 0:input$generations
-var <- c('popSizeF', 'WT', 'GD', 'NF', 'RE', 'homoWT', 'homoGD', 'heteroGD')
-modelOutput <- array(NA,
-                     dim=c(length(generation),(length(var)+ncol(inputs)+1), nrow(inputs)),
-                     dimnames=list(generation=generation, var=c("generation",colnames(inputs),var) , run=1:nrow(inputs)))
+filenames <- list.files(pattern="FigS2_[0-9]*.Rdata", full.names=TRUE)
+load(filenames[1])
+allData <- as_tibble(modelOutput)
 
-for (row in 1:nrow(inputs)){
-  results <- modelHornets.comp(inputs[row,])
-  modelOutput[,,row] <- unlist(results)
+for (index in 2:length(filenames)){
+  load(filenames[index])
+  modelOutput <- as_tibble(modelOutput)
+  modelOutput$repetitions <- index
+  allData <- rbind(allData, modelOutput)
 }
 
-modelOutput <- apply(modelOutput, 2, c)
-
-#########################################
-########## Save model ###################
-#########################################
-
-save(modelOutput, file = "FigS2.Rdata")
+modelOutput <- allData 
 
 #################### Prepare data ##################
 
