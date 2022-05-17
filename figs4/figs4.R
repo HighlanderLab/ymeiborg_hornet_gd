@@ -186,20 +186,22 @@ modelledData <- tibble(`Number of Progeny in Model` = c("Asian Hornet", "Europea
 
 p1 <- ggplot(data = lastGenStats) +
   facet_wrap(. ~ species, scales = "fixed") +
-  geom_line(aes(x = log2(value), y = mLastGen, colour = condition)) +
-  geom_point(aes(x = log2(value), y = mLastGen, colour = condition)) +
-  geom_errorbar(aes(x = log2(value), y = mLastGen, ymin = lower, ymax = upper), 
+  geom_line(aes(x = value, y = mLastGen, colour = condition)) +
+  geom_point(aes(x = value, y = mLastGen, colour = condition)) +
+  geom_errorbar(aes(x = value, y = mLastGen, ymin = lower, ymax = upper), 
                 size = 0.1, width = 0.1) +
   geom_vline(data = modelledData, 
-             aes(xintercept = log2(`Mean progeny`),
+             aes(xintercept = `Mean progeny`,
                  linetype = `Number of Progeny in Model`),
              colour = "grey") +
   scale_colour_manual(values=c(met.brewer("Greek",
                                         n = length(unique(lastGenStats$condition)))),
                       name = "Gene Drive Conditions") +
-  xlim(2.7, 8.7) +
+  scale_x_continuous(n.breaks = 6,
+                     trans = "log2") +
+  #xlim(2.7, 8.7) +
   ylab("Last viable generation") +
-  xlab("Mean progeny size (log2)") +
+  xlab("Mean progeny size") +
   PaperTheme +
   theme(strip.text.x = element_text(size = 12, face = "bold"), 
         legend.position = "bottom",
