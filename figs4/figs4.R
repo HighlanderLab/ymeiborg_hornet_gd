@@ -180,27 +180,34 @@ lastGenStats <- bind_rows(lastGenStatsRealistic, lastGenStatsOptimal, lastGenSta
 
 ################## Plots ##################
 
+modelledData <- tibble(`Number of Progeny in Model` = c("Asian Hornet", "European Paper Wasp"),
+       `Mean progeny` = c(300, 20),
+       `Last viable generation` = c(15, 15))
+
 p1 <- ggplot(data = lastGenStats) +
   facet_wrap(. ~ species, scales = "fixed") +
   geom_line(aes(x = log2(value), y = mLastGen, colour = condition)) +
   geom_point(aes(x = log2(value), y = mLastGen, colour = condition)) +
   geom_errorbar(aes(x = log2(value), y = mLastGen, ymin = lower, ymax = upper), 
                 size = 0.1, width = 0.1) +
-  geom_linerange(data = tibble(species = c("Asian Hornet", "European Paper Wasp"), 
-                               `Mean progeny` = c(300, 20),
-                               `Last viable generation` = c(15, 15),
-                               ymin = c(15, 13), ymax = c(25, 25),
-                               xmin = c(300, 20), xmax = c(300, 20)),
-                 aes(x = log2(`Mean progeny`), y = `Last viable generation`, 
-                     ymin = ymin, ymax = ymax, 
-                     xmin = log2(xmin), xmax = log2(xmax)), colour = "red", linetype = "b") +
-  scale_colour_manual(values=met.brewer("Greek", n = length(unique(lastGenStats$condition))),
+  geom_vline(data = modelledData, 
+             aes(xintercept = log2(`Mean progeny`),
+                 linetype = `Number of Progeny in Model`),
+             colour = "grey") +
+  scale_colour_manual(values=c(met.brewer("Greek",
+                                        n = length(unique(lastGenStats$condition)))),
                       name = "Gene Drive Conditions") +
-  ylim(c(0,25)) +
+  xlim(2.7, 8.7) +
   ylab("Last viable generation") +
   xlab("Mean progeny size (log2)") +
   PaperTheme +
-  theme(strip.text.x = element_text(size = 12, face = "bold"), legend.position = "bottom")
+  theme(strip.text.x = element_text(size = 12, face = "bold"), 
+        legend.position = "bottom",
+        legend.box = "vertical",
+        legend.title = element_text(size=11),
+        legend.margin = margin()) +
+  guides(colour = guide_legend(order = 1),
+         linetype = guide_legend(order = 2))
 p1
 
 ggsave(filename = "FigS4.png", plot = p1, height = 10, width = 20, unit = "cm")
