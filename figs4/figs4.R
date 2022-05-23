@@ -199,7 +199,6 @@ p1 <- ggplot(data = lastGenStats) +
                       name = "Gene Drive Conditions") +
   scale_x_continuous(n.breaks = 6,
                      trans = "log2") +
-  #xlim(2.7, 8.7) +
   ylab("Last viable generation") +
   xlab("Mean progeny size") +
   PaperTheme +

@@ -22,6 +22,7 @@ for (index in 2:length(filenames)){
 
 modelOutput <- allData
 
+load(file = "../dataGD.Rdata")
 #########################################
 ########## Plot plots ###################
 #########################################
@@ -33,6 +34,7 @@ PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
         legend.title=element_text(size=12),
         legend.position = "bottom", 
         legend.justification = "center",
+        legend.box = "vertical",
         axis.title=element_text(size=12))
 
 modelOutput <- mutate(modelOutput,
@@ -56,11 +58,11 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popS
 fig3a <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = cutRate, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  geom_point(aes(x = 0, y = 0.97, colour = "red")) +
-  xlab("P(Nonhomologous endjoining)") +
+  geom_point(data = dataGD, aes(x = Pnhej, y = Pcut, shape = `Gene Drive Condition`), fill = "white") +
+  scale_shape_manual(values = 21:23) +
+  xlab("P(Non-homologous end-joining)") +
   ylab("P(Cutting)") +
   ggtitle("Asian hornet") +
-  guides(col = "none") +
   PaperTheme
 fig3a
 

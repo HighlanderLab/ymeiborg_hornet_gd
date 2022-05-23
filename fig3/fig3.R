@@ -23,9 +23,11 @@ load(file = "../fig3f/Fig3f.Rdata")
 fig3 <- (fig3a | fig3b) /
   (fig3c | fig3d) /
   (fig3e | fig3f) +
-  plot_layout(guides = 'collect') & theme(legend.position='bottom') &
+  plot_layout(guides = 'collect') &
   plot_annotation(tag_levels = 'A') &
-  theme(plot.tag = element_text(size = 17))
+  theme(plot.tag = element_text(size = 17), 
+        legend.position='bottom', 
+        legend.box = "vertical")
 fig3
 
 ggsave(plot = fig3, filename = "Fig3.png", height = 25, width = 20, unit = "cm")

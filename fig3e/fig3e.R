@@ -22,6 +22,8 @@ for (index in 2:length(filenames)){
 
 modelOutput <- allData
 
+load(file = "../dataGD.Rdata")
+
 #########################################
 ########## Plot plots ###################
 #########################################
@@ -33,6 +35,7 @@ PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
         legend.title=element_text(size=12),
         legend.position = "bottom", 
         legend.justification = "center",
+        legend.box = "vertical",
         axis.title=element_text(size=12))
 
 modelOutput <- as_tibble(modelOutput)
@@ -58,11 +61,11 @@ heatMapData <- select(modelOutput, generation, repetitions, cutRate, pHMort, pop
 fig3e <- ggplot(data = heatMapData) +
   geom_raster(aes(x = cutRate, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  geom_point(aes(x = 0.97, y = 0.15, colour = "red")) +
+  geom_point(data = dataGD, aes(x = Pcut, y = Pmort, shape = `Gene Drive Condition`), fill = "white") +
+  scale_shape_manual(values = 21:23) +
   xlab("P(Cutting)") +
   ylab("P(GD heterozygote mortality)") +
   ggtitle("Asian hornet") +
-  guides(col = "none") +
   PaperTheme
 fig3e
 
