@@ -11,7 +11,7 @@ source("../model_function.R")
 
 input <- list()
 
-input$repetitions <- 1:10 # number of reps
+input$repetitions <- 1 # number of reps
 input$generations <- 50 #runtime of the simulation
 input$meanFemProgeny <- 20 #average of female progeny per queen
 input$meanMalProgeny <- 20 #average of male progeny per queen
