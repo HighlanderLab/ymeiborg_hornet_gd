@@ -119,8 +119,6 @@ fig2b
 
 popRep <- as_tibble(modelOutput) %>% 
   select(popSizeF, strategy, gdSex, generation, repetitions) %>%
-  group_by(generation, strategy, gdSex) %>%
-  summarise(meanPop = mean(popSizeF), sd = sd(popSizeF)) %>%
   rename(Release = gdSex) %>%
   mutate(Release = factor(Release, 
                           levels = c(1,2), 
@@ -138,7 +136,9 @@ figs0b <- ggplot(data = popRep) +
     labeller = labeller(.cols = label_value, .rows = label_both)
   ) +
   geom_line(aes(x = generation,
-                y = meanPop)) +
+                y = popSizeF,
+                group = repetitions),
+            alpha = 0.1) +
   ylim(0, 1200) +
   xlab("Generation") +
   ylab("Mean female population") +
