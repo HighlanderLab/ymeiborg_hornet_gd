@@ -117,6 +117,35 @@ fig2b <- ggplot(data = haploRep) +
   PaperTheme
 fig2b
 
+popRep <- as_tibble(modelOutput) %>% 
+  select(popSizeF, strategy, gdSex, generation, repetitions) %>%
+  group_by(generation, strategy, gdSex) %>%
+  summarise(meanPop = mean(popSizeF), sd = sd(popSizeF)) %>%
+  rename(Release = gdSex) %>%
+  mutate(Release = factor(Release, 
+                          levels = c(1,2), 
+                          labels = c("Females","Males")),
+         strategy= factor(strategy,
+                          levels = c(1,2,3,4),
+                          labels = c("Neutral","Male infertility",
+                                     "Female infertility", 
+                                     "Both-sex infertility")))
+
+figs0b <- ggplot(data = popRep) +
+  facet_grid(
+    Release ~ strategy,
+    scales = "fixed",
+    labeller = labeller(.cols = label_value, .rows = label_both)
+  ) +
+  geom_line(aes(x = generation,
+                y = meanPop)) +
+  ylim(0, 1200) +
+  xlab("Generation") +
+  ylab("Mean female population") +
+  ggtitle("European paper wasp") +
+  PaperTheme
+figs0b
+
 #########################################
 ########## Save model ###################
 #########################################
@@ -124,3 +153,7 @@ fig2b
 ggsave(plot = fig2b, filename = "Fig2b.png", height = 12, width = 20, unit = "cm")
 
 save(modelOutput, fig2b, file = "Fig2b.Rdata")
+
+ggsave(plot = figs0b, filename = "FigS0a.png", height = 12, width = 20, unit = "cm")
+
+save(figs0b, file = "FigS0b.Rdata")

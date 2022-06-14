@@ -92,7 +92,10 @@ haploRep <- as_tibble(modelOutput) %>%
 
 haploRep$strategy = factor(haploRep$strategy, 
                            levels = c(1,2,3,4),
-                           labels = c("Neutral","Male infertility","Female infertility", "Both-sex infertility"))
+                           labels = c("Neutral",
+                                      "Male infertility",
+                                      "Female infertility", 
+                                      "Both-sex infertility"))
 haploRep$`Release` = factor(haploRep$`Release`, 
                            levels = c(1,2),
                            labels = c("Females","Males"))
@@ -117,11 +120,44 @@ fig2a <- ggplot(data = haploRep) +
   PaperTheme
 fig2a
 
+popRep <- as_tibble(modelOutput) %>% 
+  select(popSizeF, strategy, gdSex, generation, repetitions) %>%
+  group_by(generation, strategy, gdSex) %>%
+  summarise(meanPop = mean(popSizeF), sd = sd(popSizeF)) %>%
+  rename(Release = gdSex) %>%
+  mutate(Release = factor(Release, 
+                          levels = c(1,2), 
+                          labels = c("Females","Males")),
+         strategy= factor(strategy,
+                          levels = c(1,2,3,4),
+                          labels = c("Neutral","Male infertility",
+                                     "Female infertility", 
+                                     "Both-sex infertility")))
+
+figs0a <- ggplot(data = popRep) +
+  facet_grid(
+    Release ~ strategy,
+    scales = "fixed",
+    labeller = labeller(.cols = label_value, .rows = label_both)
+  ) +
+  geom_line(aes(x = generation,
+                y = meanPop)) +
+  ylim(0, 1200) +
+  xlab("Generation") +
+  ylab("Mean female population") +
+  ggtitle("Asian hornet") +
+  PaperTheme
+figs0a
+
 #########################################
 ########## Save model ###################
 #########################################
 
 ggsave(plot = fig2a, filename = "Fig2a.png", height = 12, width = 20, unit = "cm")
 
+ggsave(plot = figs0a, filename = "FigS0a.png", height = 12, width = 20, unit = "cm")
+
 save(modelOutput, fig2a, file = "Fig2a.Rdata")
+
+save(figs0, file = "FigS0.Rdata")
 
