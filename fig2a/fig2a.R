@@ -144,7 +144,7 @@ figs0a <- ggplot(data = popRep) +
             alpha = 0.1) +
   ylim(0, 1200) +
   xlab("Generation") +
-  ylab("Mean female population") +
+  ylab("Female population size") +
   ggtitle("Asian hornet") +
   PaperTheme
 figs0a
