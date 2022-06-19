@@ -52,5 +52,5 @@ modelOutput <- apply(modelOutput, 2, c)
 ########## Save model ###################
 #########################################
 
-save(modelOutput, file = "Fig3e_30_3.Rdata")
+save(modelOutput, file = "Fig3e_10_3.Rdata")
 
