@@ -96,6 +96,10 @@ haploRep$`Release` = factor(haploRep$`Release`,
                            levels = c(1,2),
                            labels = c("Females","Males"))
 
+filter(haploRep, 
+       (generation == 25 & Release == "Males" & strategy == "Neutral") & 
+         (Allele == "GD" & Frequency == 0)) |> nrow() -> maleFail
+
 figs1a <- ggplot(data = haploRep) +
   facet_grid(
     `Release` ~ strategy,
