@@ -9,7 +9,7 @@ source("../model_function.R")
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="fig3b_[0-9]*.Rdata", full.names=TRUE)
+filenames <- list.files(pattern="Fig3b_[0-9]*.Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
