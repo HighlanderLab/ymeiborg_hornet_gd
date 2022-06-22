@@ -1,6 +1,6 @@
 # ymeiborg_hornet_gd
 
-This repository contains the code used to model gene drives in haplo-diploid social insects for the preprint "The suppressive potential of a gene drive in populations of invasive social wasps is limited" (Meiborg 2022). The code was run in R 4.0.0 and AlphaSimR 1.0.4.
+This repository contains the code used to model gene drives in haplo-diploid social insects for the preprint "The suppressive potential of a gene drive in populations of invasive social wasps is limited" (Meiborg, 2022). The code was run in R 4.0.0 and AlphaSimR 1.0.4.
 
 First, make sure R and the required packages are installed. Then, to load the model function, source the model_function.R file and make sure the AltphaSimR.R file is in the same folder.
 
