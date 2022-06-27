@@ -31,7 +31,7 @@ load(file = "../dataGD.Rdata")
 PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
-        title=element_text(size=14, hjust=0.5), 
+        plot.title=element_text(size=14, hjust=0.5), 
         legend.title=element_text(size=12),
         legend.position = "bottom", 
         legend.justification = "center",
@@ -61,7 +61,7 @@ heatMapData <- select(modelOutput, generation, repetitions, cutRate, pHMort, pop
 fig3f <- ggplot(data = heatMapData) +
   geom_raster(aes(x = cutRate, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  geom_point(data = dataGD, aes(x = Pcut, y = Pmort, shape = `Gene Drive Condition`), fill = "white") +
+  geom_point(data = dataGD, aes(x = Pcut, y = Pmort, shape = `Gene drive condition`), fill = "white") +
   scale_shape_manual(values = 21:23) +
   xlab("P(Cutting)") +
   ylab("P(GD heterozygote mortality)") +

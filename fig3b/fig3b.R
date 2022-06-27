@@ -30,12 +30,13 @@ load(file = "../dataGD.Rdata")
 PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
-        title=element_text(size=14, hjust=0.5), 
+        plot.title=element_text(size=14, hjust=0.5), 
         legend.title=element_text(size=12),
         legend.position = "bottom", 
         legend.justification = "center",
         legend.box = "vertical",
         axis.title=element_text(size=12))
+
 
 modelOutput <- as_tibble(modelOutput)
 
@@ -60,7 +61,7 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popS
 fig3b <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = cutRate, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  geom_point(data = dataGD, aes(x = Pnhej, y = Pcut, shape = `Gene Drive Condition`), fill = "white") +
+  geom_point(data = dataGD, aes(x = Pnhej, y = Pcut, shape = `Gene drive condition`), fill = "white") +
   scale_shape_manual(values = 21:23) +
   xlab("P(Non-homologous end-joining)") +
   ylab("P(Cutting)") +
