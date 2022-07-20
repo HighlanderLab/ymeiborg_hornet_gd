@@ -24,8 +24,8 @@ fig3 <- (fig3a | fig3b) /
   (fig3c | fig3d) /
   (fig3e | fig3f) +
   plot_layout(guides = 'collect') &
-  plot_annotation(tag_levels = 'A') &
-  theme(plot.tag = element_text(size = 17), 
+  plot_annotation(tag_levels = 'a') &
+  theme(plot.tag = element_text(size = 14), 
         legend.position='bottom', 
         legend.box = "vertical")
 fig3

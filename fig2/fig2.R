@@ -19,8 +19,8 @@ load(file = "../fig2b/Fig2b.Rdata")
 
 fig2 <- fig2a / fig2b +
   plot_layout(guides = 'collect') & theme(legend.position='bottom') &
-  plot_annotation(tag_levels = 'A') &
-  theme(plot.tag = element_text(size = 17))
+  plot_annotation(tag_levels = 'a') &
+  theme(plot.tag = element_text(size = 14))
 fig2
 
 ggsave(plot = fig2, filename = "Fig2.png", height = 25, width = 20, unit = "cm")

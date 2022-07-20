@@ -327,8 +327,9 @@ p2 <- ggplot(data = lastGenStats) +
   PaperTheme
 
 p <- p1 + p2 + 
-  plot_annotation(tag_levels = "A") +
-  plot_layout(guides = 'collect') & theme(legend.position='bottom')
+  plot_annotation(tag_levels = "a") +
+  plot_layout(guides = 'collect') & theme(legend.position='bottom') &
+  theme(plot.tag = element_text(size = 14))
 p
 
 ggsave(plot = p, filename = "FigS3.png", height = 20, width = 25, unit = "cm")
