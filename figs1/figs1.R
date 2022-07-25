@@ -23,4 +23,4 @@ figs1 <- figs1a / figs1b +
   theme(plot.tag = element_text(size = 14))
 figs1
 
-ggsave(plot = figs1, filename = "FigS1.png", height = 25, width = 20, unit = "cm")
+ggsave(plot = figs1, filename = "FigS1.png", height = 24, width = 20, unit = "cm")
