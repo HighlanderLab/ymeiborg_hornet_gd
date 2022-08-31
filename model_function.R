@@ -142,7 +142,8 @@ modelHornets <- function(input){
   }
   
   maleDH <- function(pop, meanMaleProgeny, simParam = SP){
-    pop <- homing(pop, p_nhej = pnhej, cut_rate = cutRate, simParam = simParam)
+    pop <- homing(pop, p_nhej = pnhej, cut_rate = cutRate, 
+                  p_fr = p_functionalRepair, simParam = simParam)
     tmp <- list()
     for(ind in 1:pop@nInd){
       tmp <- c(tmp, pop[ind])
@@ -210,6 +211,7 @@ modelHornets <- function(input){
   femaleOffspring <- function(females, males, crossPlan, meanProgeny, 
                               simParam = SP){
     females <- homing(females, p_nhej = pnhej, cut_rate = cutRate, 
+                      p_fr = p_functionalRepair,
                       simParam = simParam)
     
     offspring <- makeCross2_pois(females = females, 
@@ -220,7 +222,7 @@ modelHornets <- function(input){
     return(offspring)
   }
  
-  homing <- function(pop, p_nhej, cut_rate, simParam = SP) {
+  homing <- function(pop, p_nhej, cut_rate, p_fr, simParam = SP) {
     haplotype <- as_tibble(createHaploDF(pop))
     
     for (row in seq(1, nrow(haplotype), 2)) {
@@ -239,7 +241,7 @@ modelHornets <- function(input){
                                allele = 1, # 1 because it's the gene drive
                                haplotype = which(tmpHaplo[,3] != "GD"),
                                simParam = simParam)
-            } else if (runif(1) < 2/3) { # NHEJ, non-functional repair
+            } else if (runif(1) < 1-p_fr) { # NHEJ, non-functional repair
               pop <- editHaplo(pop = pop, 
                                ind = which(seq(1, nrow(haplotype), 2) == row), 
                                chr = rep(1, 2),
@@ -247,7 +249,7 @@ modelHornets <- function(input){
                                allele = c(0, 1), # 0,1 for NF
                                haplotype = which(tmpHaplo[,3] != "GD"), 
                                simParam = simParam)
-            }  else { # NHEJ, functional repair
+            } else { # NHEJ, functional repair
               pop <- editHaplo(pop = pop, 
                                ind = which(seq(1, nrow(haplotype), 2) == row), 
                                chr = rep(1, 2),
