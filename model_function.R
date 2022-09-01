@@ -157,7 +157,8 @@ modelHornets <- function(input){
   }
   
     maleOffspring <- function(females, meanMaleProgeny, simParam = SP){
-      females <- homing(females, p_nhej = pnhej, cut_rate = cutRate, simParam = simParam)
+      females <- homing(females, p_nhej = pnhej, cut_rate = cutRate, 
+                        p_fr = p_functionalRepair, simParam = simParam)
     tmp <- list()
     for(ind in 1:females@nInd){
       tmp <- c(tmp, females[ind])
