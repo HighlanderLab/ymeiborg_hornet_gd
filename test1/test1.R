@@ -2,9 +2,9 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/test/test1")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/test1")
 
-source("../../model_function.R")
+source("../model_function.R")
 
 #########################################
 ########## Set input parameters #########
