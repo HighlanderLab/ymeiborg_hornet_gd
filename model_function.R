@@ -143,7 +143,7 @@ modelHornets <- function(input){
   
   maleDH <- function(pop, meanMaleProgeny, simParam = SP){
     pop <- homing(pop, p_nhej = pnhej, cut_rate = cutRate, 
-                  p_fr = p_functionalRepair, simParam = simParam)
+                  p_fr = pFunctionalRepair, simParam = simParam)
     tmp <- list()
     for(ind in 1:pop@nInd){
       tmp <- c(tmp, pop[ind])
@@ -158,7 +158,7 @@ modelHornets <- function(input){
   
     maleOffspring <- function(females, meanMaleProgeny, simParam = SP){
       females <- homing(females, p_nhej = pnhej, cut_rate = cutRate, 
-                        p_fr = p_functionalRepair, simParam = simParam)
+                        p_fr = pFunctionalRepair, simParam = simParam)
     tmp <- list()
     for(ind in 1:females@nInd){
       tmp <- c(tmp, females[ind])
@@ -212,7 +212,7 @@ modelHornets <- function(input){
   femaleOffspring <- function(females, males, crossPlan, meanProgeny, 
                               simParam = SP){
     females <- homing(females, p_nhej = pnhej, cut_rate = cutRate, 
-                      p_fr = p_functionalRepair,
+                      p_fr = pFunctionalRepair,
                       simParam = simParam)
     
     offspring <- makeCross2_pois(females = females, 
