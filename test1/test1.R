@@ -87,15 +87,10 @@ modelOutput <- mutate(modelOutput,
                       pFunctionalRepair = factor(pFunctionalRepair))
 
 haploRep <- as_tibble(modelOutput) %>% 
-  select(p_funtionalRepair, gdSex, generation, repetitions, WT:RE, N, nGD, k) %>% 
+  select(pFunctionalRepair, gdSex, generation, repetitions, WT:RE, N, nGD, k) %>% 
   pivot_longer(cols = WT:RE) %>% 
   rename("Release" = gdSex, Allele = name, Frequency = value)
 
-haploRep$strategy = factor(haploRep$strategy, 
-                           levels = c(1,2,3),
-                           labels = c("0.01",
-                                      "0.078",
-                                      "0.15"))
 haploRep$`Release` = factor(haploRep$`Release`, 
                             levels = c(1,2),
                             labels = c("Females","Males"))
@@ -104,7 +99,7 @@ haploRep$`Release` = factor(haploRep$`Release`,
 #        (generation == 25 & Release == "Males" & strategy == "Neutral") & 
 #          (Allele == "GD" & Frequency == 0)) |> nrow() -> maleFail
 
-test1 <- ggplot(data = haploRep) +
+test1_1 <- ggplot(data = haploRep) +
   facet_grid(
     `Release` ~ pFunctionalRepair,
     scales = "fixed",
@@ -116,19 +111,43 @@ test1 <- ggplot(data = haploRep) +
     group = interaction(Allele, repetitions),
     colour = Allele
   )) +
-  scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
-                                     alpha = 0.15)) +
+  scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4))) +
   guides(colour = guide_legend(override.aes = list(alpha = 1))) +
   xlab("Generation") +
   ggtitle("Asian hornet") +
   PaperTheme
-fig2a
+test1_1
+
+popRep <- as_tibble(modelOutput) %>% 
+  select(popSizeF, pFunctionalRepair, gdSex, generation, repetitions) %>%
+  rename(Release = gdSex) %>%
+  mutate(Release = factor(Release, 
+                          levels = c(1,2), 
+                          labels = c("Females","Males")))
+
+test1_2 <- ggplot(data = popRep) +
+  facet_grid(
+    Release ~ pFunctionalRepair,
+    scales = "fixed",
+    labeller = labeller(.cols = label_value, .rows = label_both)
+  ) +
+  geom_line(aes(x = generation,
+                y = popSizeF,
+                group = repetitions),
+            alpha = 0.1) +
+  ylim(0, 1200) +
+  xlab("Generation") +
+  ylab("Female population size") +
+  ggtitle("Asian hornet") +
+  PaperTheme
+test1_2
 
 #########################################
 ########## Save model ###################
 #########################################
 
-ggsave(plot = test1, filename = "Test1.png", height = 12, width = 20, unit = "cm")
+ggsave(plot = test1_1, filename = "Test1_1.png", height = 12, width = 20, unit = "cm")
+ggsave(plot = test1_2, filename = "Test1_2.png", height = 12, width = 20, unit = "cm")
 
-save(test1, file = "Test1.Rdata")
+save(test1, test1_2, file = "Test1Plots.Rdata")
 
