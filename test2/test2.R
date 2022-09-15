@@ -2,56 +2,78 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/test2")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3b")
 source("../model_function.R")
 
-#########################################
-########## Set input parameters #########
-#########################################
+#############################
+######## load data ##########
+#############################
 
-input <- list()
+filenames <- list.files(pattern="Test2_[0-9]*.Rdata", full.names=TRUE)
+load(filenames[1])
+allData <- as_tibble(modelOutput)
 
-input$repetitions <- 1 # number of reps
-input$generations <- 25 #runtime of the simulation
-input$meanFemProgeny <- 300 #average of female progeny per queen
-input$meanMalProgeny <- 300 #average of male progeny per queen
-input$meanFemMatings <- 3.275 #average number of times females mate
-input$meanMalMatings <- 0.9 #average number of times males mate
-input$maxFemMatings <- 4 #maximum number of times females mate
-input$maxMalMatings <- 2 #maximum number of times males mate
-input$k <- 1000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
-input$rmax <- 10 #growth rate of the population
-input$N <- 1000 #size of start WT population
-input$gdSex <- "F" #which sex carries the gene drive F or M
-input$nGD <- 100 #number of gene drive carrying animals to introduce
-input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
-input$pnhej <- c(0, 0.02) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
-input$cutRate <- seq(0.8, 1, 0.05) #probability CRISPR cuts the opposite DNA strand
-input$pHMort <- seq(0, 0.5, 0.1) #mortality of gene drive carriers.
-input$pFunctionalRepair <- c(0.078) #probability a resistance allele forms after non-homologous end-joining.
-inputs <- expand.grid(input)
-
-#########################################
-########## Run model ####################
-#########################################
-
-# Track population information
-generation <- 0:input$generations
-var <- c('popSizeF', 'WT', 'GD', 'NF', 'RE', 'homoWT', 'homoGD', 'heteroGD')
-modelOutput <- array(NA,
-                     dim=c(length(generation),(length(var)+ncol(inputs)+1), nrow(inputs)),
-                     dimnames=list(generation=generation, var=c("generation",colnames(inputs),var) , run=1:nrow(inputs)))
-
-for (row in 1:nrow(inputs)){
-  results <- modelHornets.comp(inputs[row,])
-  modelOutput[,,row] <- unlist(results)
+for (index in 2:length(filenames)){
+  load(filenames[index])
+  modelOutput <- as_tibble(modelOutput)
+  modelOutput$repetitions <- index
+  allData <- rbind(allData, modelOutput)
 }
 
-modelOutput <- apply(modelOutput, 2, c)
+modelOutput <- allData
+
+load(file = "../dataGD.Rdata")
+#########################################
+########## Plot plots ###################
+#########################################
+
+PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        plot.title=element_text(size=14, hjust=0.5), 
+        legend.title=element_text(size=12),
+        legend.position = "bottom", 
+        legend.justification = "center",
+        legend.box = "vertical",
+        axis.title=element_text(size=12))
+
+
+modelOutput <- as_tibble(modelOutput)
+
+modelOutput <- mutate(modelOutput,
+                      strategy = factor(strategy),
+                      N = factor(N),
+                      nGD = factor(nGD),
+                      k = factor(k),
+                      gdSex = factor(gdSex),
+                      rmax = factor(rmax),
+                      generations = factor(generations),
+                      repetitions = factor(repetitions),
+                      pnhej = factor(pnhej),
+                      pFunctionalRepair = factor(pFunctionalRepair))
+
+heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, pHMort, popSizeF) %>%
+  filter(generation == max(generation)) %>%
+  rowwise() %>%
+  mutate(suppressed = case_when(popSizeF == 0 ~ 1,
+                                popSizeF > 0 ~ 0)) %>%
+  group_by(pnhej, cutRate, pHMort) %>%
+  summarise(suppressionRate = sum(suppressed)/10)
+
+test2 <- ggplot(data = heatMapData) +
+  facet_grid(pnhej ~ .) +
+  geom_raster(aes(x = cutRate, y = pHMort, fill = suppressionRate)) +
+  scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
+  xlab("P(Cutting)") +
+  ylab("P(Heterozygous mortality)") +
+  ggtitle("Asian Hornet") +
+  PaperTheme
+test2
+
+ggsave(plot = test2, filename = "Test2.png", height = 11, width = 10, unit = "cm")
 
 #########################################
 ########## Save model ###################
 #########################################
 
-save(modelOutput, file = "Test2_1.Rdata")
-
+save(modelOutput, test2, file = "Test2.Rdata")
