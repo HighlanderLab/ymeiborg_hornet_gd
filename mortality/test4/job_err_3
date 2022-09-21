@@ -1,0 +1,48 @@
+Loading required package: AlphaSimR
+Loading required package: R6
+Loading required package: tidyr
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following object is masked from ‘package:AlphaSimR’:
+
+    mutate
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Loading required package: reshape2
+
+Attaching package: ‘reshape2’
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+Loading required package: data.table
+
+Attaching package: ‘data.table’
+
+The following objects are masked from ‘package:reshape2’:
+
+    dcast, melt
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: doParallel
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: parallel
+Loading required package: compiler
+Loading required package: ggplot2
+Loading required package: extraDistr
+Loading required package: patchwork
+Loading required package: MetBrewer

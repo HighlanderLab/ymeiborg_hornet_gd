@@ -3,7 +3,7 @@
 ##########################
 
 setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/mortality/test3")
-source("../model_function.R")
+source("../model_function_mort.R")
 
 #########################################
 ########## Set input parameters #########

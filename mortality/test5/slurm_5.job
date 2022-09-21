@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #FILENAME: slurm.job
-#SBATCH -J test2_5 # job name
+#SBATCH -J test5_5 # job name
 #SBATCH -A bharpur # partition name
 #SBATCH -N 1 # number of nodes
 #SBATCH -n 1 # number of cores
@@ -17,6 +17,6 @@ module load r/4.0.0 # load R
 
 echo "Beginning jobbo"
 
-Rscript test2_5.R
+Rscript test5_5.R
 
 echo "Done with jobbo"
