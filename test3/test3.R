@@ -61,6 +61,7 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, pFunctionalRe
 test3 <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = pFunctionalRepair, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
+  scale_y_continuous(breaks = c(0.01, 0.078, 0.15, 0.2, 0.3)) +
   xlab("P(Non-homologous end-joining)") +
   ylab("P(Functionl repair)") +
   ggtitle("Asian Hornet") +
