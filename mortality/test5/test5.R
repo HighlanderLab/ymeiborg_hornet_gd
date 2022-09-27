@@ -66,7 +66,7 @@ test5 <- ggplot(data = heatMapData) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Cutting)") +
   ylab("P(Heterozygous mortality)") +
-  ggtitle("Asian Hornet") +
+  ggtitle("European paper wasp") +
   PaperTheme
 test5
 

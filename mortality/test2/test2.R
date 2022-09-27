@@ -111,7 +111,7 @@ test2_1 <- ggplot(data = haploRep) +
   scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4))) +
   guides(colour = guide_legend(override.aes = list(alpha = 1))) +
   xlab("Generation") +
-  ggtitle("Asian hornet") +
+  ggtitle("European paper wasp") +
   PaperTheme
 test2_1
 
@@ -135,7 +135,7 @@ test2_2 <- ggplot(data = popRep) +
   ylim(0, 1200) +
   xlab("Generation") +
   ylab("Female population size") +
-  ggtitle("Asian hornet") +
+  ggtitle("European paper wasp") +
   PaperTheme
 test2_2
 
@@ -146,5 +146,5 @@ test2_2
 ggsave(plot = test2_1, filename = "Test2_1.png", height = 12, width = 20, unit = "cm")
 ggsave(plot = test2_2, filename = "Test2_2.png", height = 12, width = 20, unit = "cm")
 
-save(test2, test2_2, file = "Test2Plots.Rdata")
+save(test2_1, test2_2, file = "Test2Plots.Rdata")
 
