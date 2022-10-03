@@ -7,6 +7,7 @@
 #SBATCH -n 9 # number of cores
 #SBATCH -t 3-00:00:00
 #SBATCH --mem=50000 # memory
+#SBATCH --nice=100
 #SBATCH -o job_out_5_2  # assign standard output file name
 #SBATCH -e job_err_5_2  # assign standard error file name
 #SBATCH --mail-type=end,fail # email you when begin, end, fail, requeue
