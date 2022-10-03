@@ -21,9 +21,9 @@ input$meanFemMatings <- 3.275 #average number of times females mate
 input$meanMalMatings <- 0.9 #average number of times males mate
 input$maxFemMatings <- 4 #maximum number of times females mate
 input$maxMalMatings <- 3 #maximum number of times males mate
-input$k <- 1000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
+input$k <- 2000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
 input$rmax <- 10 #growth rate of the population
-input$N <- 1000 #size of start WT population
+input$N <- 2000 #size of start WT population
 input$winterMort <- 0.978 #winter mortality rate
 input$gdSex <- c("F", "M") #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce

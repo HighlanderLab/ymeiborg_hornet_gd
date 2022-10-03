@@ -2,7 +2,7 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/test2")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/mortality/test5")
 source("../model_function_mort.R")
 
 #########################################

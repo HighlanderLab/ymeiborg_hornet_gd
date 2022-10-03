@@ -46,10 +46,3 @@ Loading required package: ggplot2
 Loading required package: extraDistr
 Loading required package: patchwork
 Loading required package: MetBrewer
-Warning message:
-Removed 1402 row(s) containing missing values (geom_path). 
-Warning message:
-Removed 1402 row(s) containing missing values (geom_path). 
-Error in save(test1, test1_2, file = "Test1Plots.Rdata") : 
-  object ‘test1’ not found
-Execution halted
