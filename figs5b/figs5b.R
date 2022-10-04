@@ -2,7 +2,7 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig2a")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig5b")
 
 source("../model_function.R")
 
@@ -29,11 +29,18 @@ input$gdSex <- "F" #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce
 input$multiplex <- 1 #how many multiplexes in the gene drives, not used currently
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
-input$pnhej <- 0.02 #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
-input$cutRate <- 0.95 #propability CRISPR cuts the opposite DNA strand
-input$pHMort <- 0 #mortality of gene drive carriers.
+input$pnhej <- c(0, 0.02) #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
+input$cutRate <- c(1, 0.95, 0.97) #propability CRISPR cuts the opposite DNA strand
+input$pHMort <- c(0, 0.1, 0.15) #mortality of gene drive carriers.
 input$pFunctionalRepair <- 1/3 #probability a resistance allele forms after non-homologous end-joining.
 inputs <- expand.grid(input)
+
+inputs <- inputs %>%
+  filter((meanFemProgeny==meanMalProgeny & meanFemMatings==3.275 & maxFemMatings==4 | 
+            meanFemProgeny==meanMalProgeny & meanFemMatings==0.2 & maxFemMatings==2) &
+           ((pnhej == 0 & cutRate == 1 & pHMort == 0) |
+              (pnhej == 0.02 & cutRate == 0.95 & pHMort == 0.1) |
+              (pnhej == 0 & cutRate == 0.97 & pHMort == 0.15)))
 
 #########################################
 ########## Run model ####################
