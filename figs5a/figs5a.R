@@ -1,0 +1,61 @@
+##########################
+########## Setup #########
+##########################
+
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig2a")
+
+source("../model_function.R")
+
+#########################################
+########## Set input parameters #########
+#########################################
+
+input <- list()
+
+input$repetitions <- 1:25 # number of reps
+input$generations <- 25 #runtime of the simulation
+
+input$meanFemProgeny <- 300 #average of femlae progeny per queen
+input$meanMalProgeny <- 300 #average of male progeny per queen
+input$meanFemMatings <- 3.275 #average number of times females mate
+input$meanMalMatings <- 0.9 #average number of times males mate
+input$maxFemMatings <- 4 #maximum number of times females mate
+input$maxMalMatings <- 3 #maximum number of times males mate
+input$k <- 1000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
+input$rmax <- 10 #growth rate of the population
+input$N <- 1000 #size of start WT population
+input$winterMort <- c(0.95, 0.96, 0.97, 0.98, 0.99)
+input$gdSex <- "F" #which sex carries the gene drive F or M
+input$nGD <- 100 #number of gene drive carrying animals to introduce
+input$multiplex <- 1 #how many multiplexes in the gene drives, not used currently
+input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
+input$pnhej <- 0.02 #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
+input$cutRate <- 0.95 #propability CRISPR cuts the opposite DNA strand
+input$pHMort <- 0 #mortality of gene drive carriers.
+input$pFunctionalRepair <- 1/3 #probability a resistance allele forms after non-homologous end-joining.
+inputs <- expand.grid(input)
+
+#########################################
+########## Run model ####################
+#########################################
+
+# Track population information
+generation <- 0:input$generations
+var <- c('popSizeF', 'WT', 'GD', 'NF', 'RE', 'homoWT', 'homoGD', 'heteroGD')
+modelOutput <- array(NA,
+                     dim=c(length(generation),(length(var)+ncol(inputs)+1), nrow(inputs)),
+                     dimnames=list(generation=generation, var=c("generation",colnames(inputs),var) , run=1:nrow(inputs)))
+
+for (row in 1:nrow(inputs)){
+  results <- modelHornets.comp(inputs[row,])
+  modelOutput[,,row] <- unlist(results)
+}
+
+modelOutput <- apply(modelOutput, 2, c)
+
+#########################################
+########## Save model ###################
+#########################################
+
+save(modelOutput, file = "Fig5a.Rdata")
+
