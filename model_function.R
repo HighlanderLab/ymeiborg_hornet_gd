@@ -96,7 +96,7 @@ modelHornets <- function(input){
         pop_f <- pop_f[!(pop_f@id %in% intersect(haplo1, haplo2))]
         pop <- mergePops(list(pop_m, pop_f))
       }
-    } else if (strategy == 4) { # Female infertility
+    } else if (strategy == 4) { # Both infertility
       haploDF <- createHaploDF(pop)
       haplo1 <- haploDF[haplo == 1 & (locus1 == "GD" | locus1 == "NF"), id]
       haplo2 <- haploDF[haplo == 2 & (locus1 == "GD" | locus1 == "NF"), id]
@@ -353,7 +353,7 @@ modelHornets <- function(input){
                                    simParam = SP)
     pop <- mergePops(list(offspring_m, offspring_f))
     
-    ##### Mating ##### 
+    ##### Mating and mortality ##### 
     # Gene drive fitness cost
     pop <- heterozygousMortality(pop = pop, pHeteroMort = pHMort)
     
@@ -371,6 +371,19 @@ modelHornets <- function(input){
       break
     }
     
+    # Winter mortality
+    pop_f <- pop[pop@sex == "F"]
+    pop_m <- pop[pop@sex == "M"]
+    pop_f <- mortality(pop_f, winterMort)
+    
+    if (pop_f@nInd == 0 | pop_m@nInd == 0) {  
+      results[(generation + 1):nrow(results), var[1]] <- rep(0, 
+                                                             length((generation + 1):nrow(results)))
+      break
+    }
+    
+    pop <- mergePops(list(pop_f, pop_m))
+    
     # Keep only reproducing individuals
     fertiles <- fertility(pop = pop, strategy = strategy)
     queens <- fertiles[fertiles@sex == "F"]
@@ -382,7 +395,7 @@ modelHornets <- function(input){
       break
     }
     
-    # Remove infertile crosses
+    # Remove infertile and dead crosses
     crossPlan <- removeUnsuccessfulCrosses(crosses = crossPlan,
                                            fertileFemales = queens@id,
                                            fertileMales = drones@id)
@@ -395,7 +408,6 @@ modelHornets <- function(input){
     queens <- queens[queens@id %in% crossPlan$Mothers]
     drones <- drones[drones@id %in% crossPlan$Fathers]
     
-    ##### Mortality ##### 
     # Density dependent female mortality with logistic function
     maxPopSize <- rpois(1, k/(1+((k-Nt)/Nt)*rmax^-1))
     mortalityRate <- 1-maxPopSize/queens@nInd
