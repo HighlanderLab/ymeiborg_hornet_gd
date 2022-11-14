@@ -24,6 +24,7 @@ input$maxMalMatings <- 3 #maximum number of times males mate
 input$k <- 1000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
 input$rmax <- 10 #growth rate of the population
 input$N <- 1000 #size of start WT population
+input$winterMort <- 0.5 #winter mortality
 input$gdSex <- c("F","M") #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce
 input$multiplex <- 1 #how many multiplexes in the gene drives, not used currently
@@ -31,7 +32,7 @@ input$strategy <- c(1,2,3,4) #what targeting strategy to use 1 = neutral, 2 = ma
 input$pnhej <- 0.02 #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
 input$cutRate <- 0.95 #propability CRISPR cuts the opposite DNA strand
 input$pHMort <- 0 #mortality of gene drive carriers.
-input$pFunctionalRepair <- 1/3 #probability a resistance allele forms after non-homologous end-joining.
+input$pFunctionalRepair <- 0.01 #probability a resistance allele forms after non-homologous end-joining.
 inputs <- expand.grid(input)
 
 #########################################
