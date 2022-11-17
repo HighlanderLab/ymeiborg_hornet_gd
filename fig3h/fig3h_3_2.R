@@ -26,7 +26,7 @@ input$winterMort <- 0.50
 input$gdSex <- "F" #which sex carries the gene drive F or M
 input$nGD <- 100 #number of gene drive carrying animals to introduce
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
-input$pnhej <- seq(0.11, 0.02, 0.01) #probability of non-homologous end joining, determines the resistance alleles (0.2 in mosquitos)
+input$pnhej <- seq(0.11, 0.2, 0.01) #probability of non-homologous end joining, determines the resistance alleles (0.2 in mosquitos)
 input$cutRate <- 1 #probability CRISPR cuts the opposite DNA strand
 input$pHMort <- 0 #mortality of gene drive carriers.
 input$pFunctionalRepair <- lseq(0.000001, 0.1, 21)[12:21] #probability a resistance allele forms after non-homologous end-joining.
