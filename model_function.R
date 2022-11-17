@@ -6,7 +6,7 @@ rm(list = ls())
 
 packages <- c('AlphaSimR','tidyr', 'dplyr', 'reshape2', 'data.table',
               'doParallel', 'compiler', 'ggplot2', 'extraDistr',
-              'patchwork','MetBrewer')
+              'patchwork','MetBrewer', 'sfsmisc')
 
 package.check <- lapply(
   packages,
