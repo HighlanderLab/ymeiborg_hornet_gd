@@ -29,7 +29,7 @@ input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = f
 input$pnhej <- 0 #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
 input$cutRate <- seq(0.8, 0.9, 0.01) #probability CRISPR cuts the opposite DNA strand
 input$pHMort <- seq(0.275, 0.5, 0.025) #mortality of gene drive carriers.
-input$pFunctionalRepair <- 0.01 #probability a resistance allele forms after non-homologous end-joining.
+input$pFunctionalRepair <- 0 #probability a resistance allele forms after non-homologous end-joining.
 inputs <- expand.grid(input)
 
 #########################################
