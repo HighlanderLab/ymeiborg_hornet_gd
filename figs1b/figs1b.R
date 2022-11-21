@@ -141,6 +141,23 @@ figs1.5b <- ggplot(data = popRep) +
   PaperTheme
 figs1.5b
 
+suppRateData <- select(modelOutput, generation, repetitions, strategy, gdSex, popSizeF) %>%
+  filter(generation == max(generation)) %>%
+  rowwise() %>%
+  mutate(suppressed = case_when(popSizeF == 0 ~ 1,
+                                popSizeF > 0 ~ 0)) %>%
+  group_by(strategy, gdSex) %>%
+  summarise(suppressionRate = sum(suppressed)/100)
+
+LastGenData <- select(modelOutput, generation, repetitions, strategy, gdSex, popSizeF) %>%
+  filter(popSizeF > 0) %>%
+  group_by(repetitions, strategy, gdSex) %>%
+  filter(generation == max(generation)) %>%
+  ungroup() %>%
+  group_by(strategy, gdSex) %>%
+  summarise(lastGenMean = mean(generation),
+            lastGenSD = sd(generation))
+
 #########################################
 ########## Save model ###################
 #########################################
