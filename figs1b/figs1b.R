@@ -123,6 +123,24 @@ figs1b <- ggplot(data = haploRep) +
   PaperTheme
 figs1b
 
+
+figs1.5b <- ggplot(data = popRep) +
+  facet_grid(
+    Release ~ strategy,
+    scales = "fixed",
+    labeller = labeller(.cols = label_value, .rows = label_both)
+  ) +
+  geom_line(aes(x = generation,
+                y = popSizeF,
+                group = repetitions),
+            alpha = 0.1) +
+  ylim(0, 1200) +
+  xlab("Generation") +
+  ylab("Female population size") +
+  ggtitle("European paper wasp") +
+  PaperTheme
+figs1.5b
+
 #########################################
 ########## Save model ###################
 #########################################
@@ -130,4 +148,8 @@ figs1b
 ggsave(plot = figs1b, filename = "FigS1b.png", height = 12, width = 20, unit = "cm")
 
 save(modelOutput, figs1b, file = "FigS1b.Rdata")
+
+ggsave(plot = figs1.5b, filename = "FigS1.5a.png", height = 12, width = 20, unit = "cm")
+
+save(figs1.5b, file = "FigS1.5b.Rdata")
 

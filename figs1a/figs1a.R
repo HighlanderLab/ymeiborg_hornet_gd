@@ -122,6 +122,35 @@ figs1a <- ggplot(data = haploRep) +
   PaperTheme
 figs1a
 
+popRep <- as_tibble(modelOutput) %>% 
+  select(popSizeF, strategy, gdSex, generation, repetitions) %>%
+  rename(Release = gdSex) %>%
+  mutate(Release = factor(Release, 
+                          levels = c(1,2), 
+                          labels = c("Females","Males")),
+         strategy= factor(strategy,
+                          levels = c(1,2,3,4),
+                          labels = c("Neutral","Male infertility",
+                                     "Female infertility", 
+                                     "Both-sex infertility")))
+
+figs1.5a <- ggplot(data = popRep) +
+  facet_grid(
+    Release ~ strategy,
+    scales = "fixed",
+    labeller = labeller(.cols = label_value, .rows = label_both)
+  ) +
+  geom_line(aes(x = generation,
+                y = popSizeF,
+                group = repetitions),
+            alpha = 0.1) +
+  ylim(0, 1200) +
+  xlab("Generation") +
+  ylab("Female population size") +
+  ggtitle("Asian hornet") +
+  PaperTheme
+figs1.5a
+
 #########################################
 ########## Save model ###################
 #########################################
@@ -129,3 +158,8 @@ figs1a
 ggsave(plot = figs1a, filename = "FigS1a.png", height = 12, width = 20, unit = "cm")
 
 save(modelOutput, figs1a, file = "FigS1a.Rdata")
+
+ggsave(plot = figs1.5a, filename = "FigS1.5a.png", height = 12, width = 20, unit = "cm")
+
+save(figs1.5a, file = "FigS1.5a.Rdata")
+
