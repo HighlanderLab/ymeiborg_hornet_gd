@@ -9,7 +9,7 @@ source("../model_function.R")
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="fig3j_[0-9]*_[0-9].Rdata", full.names=TRUE)
+filenames <- list.files(pattern="Fig3j_[0-9]*_[0-9].Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -50,21 +50,22 @@ modelOutput <- mutate(modelOutput,
                         generations = factor(generations),
                         repetitions = factor(repetitions))
 
-heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popSizeF) %>%
+heatMapData <- select(modelOutput, generation, repetitions, cutRate, pFunctionalRepair, popSizeF) %>%
   filter(generation == max(generation)) %>%
   rowwise() %>%
   mutate(suppressed = case_when(popSizeF == 0 ~ 1,
                                 popSizeF > 0 ~ 0)) %>%
-  group_by(pnhej, cutRate) %>%
+  group_by(pFunctionalRepair, cutRate) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
 fig3j <- ggplot(data = heatMapData) +
-  geom_raster(aes(x = pnhej, y = cutRate, fill = suppressionRate)) +
+  geom_raster(aes(x = pFunctionalRepair, y = cutRate, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  geom_point(data = dataGD, aes(x = Pnhej, y = pFunctionalRepair, shape = `Gene drive condition`), fill = "white") +
-  scale_shape_manual(values = 21:23) +
-  xlab("P(Non-homologous end-joining)") +
-  ylab("P(Functional repair)") +
+  #geom_point(data = dataGD, aes(x = pFunctionalRepair, y = Pcut, shape = `Gene drive condition`), fill = "white") +
+  #scale_shape_manual(values = 21:23) +
+  scale_x_continuous(trans='log10') +
+  xlab("P(Functional repair)") +
+  ylab("P(Cutting)") +
   ggtitle("European paper wasp") +
   PaperTheme
 fig3j
