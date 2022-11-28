@@ -10,8 +10,8 @@ source("../model_function.R")
 ######## load data ##########
 #############################
 
-load(file = "../fig2a/FigS1.5a.Rdata")
-load(file = "../fig2b/FigS1.5b.Rdata")
+load(file = "../figs1a/FigS1.5a.Rdata")
+load(file = "../figs1b/FigS1.5b.Rdata")
 
 #########################################
 ########## Plot plots ###################

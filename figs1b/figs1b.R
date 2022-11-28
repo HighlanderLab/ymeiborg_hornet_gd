@@ -123,6 +123,17 @@ figs1b <- ggplot(data = haploRep) +
   PaperTheme
 figs1b
 
+popRep <- as_tibble(modelOutput) %>% 
+  select(popSizeF, strategy, gdSex, generation, repetitions) %>%
+  rename(Release = gdSex) %>%
+  mutate(Release = factor(Release, 
+                          levels = c(1,2), 
+                          labels = c("Females","Males")),
+         strategy= factor(strategy,
+                          levels = c(1,2,3,4),
+                          labels = c("Neutral","Male infertility",
+                                     "Female infertility", 
+                                     "Both-sex infertility")))
 
 figs1.5b <- ggplot(data = popRep) +
   facet_grid(
