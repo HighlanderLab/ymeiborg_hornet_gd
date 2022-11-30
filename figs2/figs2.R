@@ -26,7 +26,7 @@ input$rmax <- c(2,6,10,14,18) #growth rate of the population
 input$N <- 1000 #size of start WT population
 input$winterMort <- c(0.95, 0.96, 0.97, 0.98, 0.99) #winter mortalty
 input$gdSex <- "F" #which sex carries the gene drive F or M
-input$nGD <- 100 #number of gene drive carrying animals to introduce
+input$nGD <- c(0, 100) #number of gene drive carrying animals to introduce
 input$strategy <- 3 #what targeting strategy to use 1 = neutral, 2 = male, 3 = female
 input$pnhej <- 0.02 #probability of non-homologous end joining, determines the resistance alleles (0.02 in mosquitos)
 input$cutRate <- 0.95 #propability CRISPR cuts the opposite DNA strand
@@ -41,7 +41,7 @@ inputs <- inputs %>%
            (meanFemProgeny==300 & meanMalProgeny==300 & meanFemMatings==3.275 & meanMalMatings==0.9 & rmax==10 & maxMalMatings==2 & winterMort == 0.97) |
            (meanFemProgeny==300 & meanMalProgeny==300 & meanFemMatings==3.275 & meanMalMatings==0.9 & maxFemMatings==4 & maxMalMatings==2 & winterMort == 0.97) |
            (meanFemProgeny==300 & meanMalProgeny==300 & meanFemMatings==3.275 & rmax==10 & maxFemMatings==4 & maxMalMatings==2 & winterMort == 0.97) |
-           (meanFemProgeny==300 & meanMalProgeny==300 & meanMalMatings==0.9 & rmax==10 & maxFemMatings==4 & maxMalMatings==2 & winterMort == 0.97)
+           (meanFemProgeny==300 & meanMalProgeny==300 & meanMalMatings==0.9 & rmax==10 & maxFemMatings==4 & maxMalMatings==2 & winterMort == 0.97) |
            (meanFemProgeny==meanMalProgeny & meanFemMatings==3.275 & meanMalMatings==0.9 & rmax==10 & maxFemMatings==4 & maxMalMatings==2 & winterMort == 0.97))
  
 #########################################
@@ -76,6 +76,7 @@ modelOutput <- rowwise(modelOutput) %>%
   select(-meanMalProgeny) %>%
   rename(meanProgeny = meanFemProgeny) %>%
   mutate(variableRange = case_when(
+    winterMort != 0.97 ~ "winterMort",
     meanProgeny != 300 ~ "meanProgeny",
     meanFemMatings != 3.275 ~ "meanFemMatings",
     meanMalMatings != 0.9 ~ "meanMalMatings",
@@ -88,9 +89,11 @@ modelOutput <- rowwise(modelOutput) %>%
 PaperTheme <- theme_bw(base_size = 11, base_family = "sans") + 
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
+        panel.border = element_blank(), 
         title=element_text(size=14, hjust=0.5), 
         plot.title=element_text(size=14, hjust=0.5),
         #legend.position="none",
+        axis.line = element_line(),
         axis.title=element_text(size=12))
 
 year25 <- filter(modelOutput, generation == 25)
@@ -105,8 +108,8 @@ suppressed <- rowwise(year25) %>%
   group_by(paramSet) %>%
   mutate(suppressionRate = sum(suppressed)/10) %>%
   distinct(paramSet, .keep_all = TRUE) %>%
-  select(paramSet, meanProgeny:maxMalMatings, rmax, suppressionRate, variableRange) %>%
-  pivot_longer(cols = meanProgeny:rmax) %>%
+  select(paramSet, meanProgeny:maxMalMatings, rmax, winterMort, suppressionRate, variableRange) %>%
+  pivot_longer(cols = meanProgeny:winterMort) %>%
   filter(variableRange == name | variableRange == "default") %>%
   mutate(name = factor(name)) %>%
   arrange(name)
@@ -114,10 +117,10 @@ suppressed <- rowwise(year25) %>%
 suppressed$name <- factor(suppressed$name, 
                           levels = c('rmax','meanFemMatings','meanMalMatings',
                                      'maxFemMatings','maxMalMatings',
-                                     'meanProgeny', 'default'), 
+                                     'meanProgeny', 'winterMort', 'default'), 
                           labels = c('Max growth rate','Mean female matings','Mean male matings',
                                      'Max female matings','Max male matings',
-                                     'Mean progeny', 'Default'))
+                                     'Mean progeny', 'Winter Mortality', 'Default'))
 suppressed <- suppressed[order(suppressed$name),]
 
 modelOutput$paramSet <- rep(1:ntimes, each = nrow(modelOutput)/ntimes)
@@ -135,27 +138,51 @@ lastGenStats <- group_by(lastGen, paramSet) %>%
 lastGenStats <- left_join(x = lastGenStats, 
                           y = lastGen, by = "paramSet") %>%
   distinct(paramSet, .keep_all = TRUE) %>%
-  select(paramSet:semLastGen, meanProgeny:rmax, -k, variableRange) %>%
-  pivot_longer(cols = meanProgeny:rmax) %>%
+  select(paramSet:semLastGen, meanProgeny:rmax, winterMort, -k, variableRange) %>%
+  pivot_longer(cols = meanProgeny:winterMort) %>%
   filter(variableRange == name | variableRange == "default") %>%
-  mutate(name = factor(name, levels = c('rmax','meanFemMatings','meanMalMatings',
-                                        'maxFemMatings','maxMalMatings',
-                                        'meanProgeny', 'default'), 
-                       labels = c('Max growth rate','Mean female matings','Mean male matings',
+  mutate(name = factor(name, levels = c('rmax','meanFemMatings',
+                                        'meanMalMatings', 'maxFemMatings',
+                                        'maxMalMatings', 'meanProgeny', 'winterMort', 'default'), 
+                       labels = c('Max growth rate',
+                                  'Mean female matings','Mean male matings',
                                   'Max female matings','Max male matings',
-                                  'Mean progeny', 'Default')), 
+                                  'Mean progeny', 'Winter Mortality', 'Default')), 
          variableRange = factor(variableRange, levels = c('rmax','meanFemMatings','meanMalMatings',
                                                           'maxFemMatings','maxMalMatings',
-                                                          'meanProgeny', 'default'), 
-                                labels = c('Max growth rate','Mean female matings','Mean male matings',
-                                           'Max female matings','Max male matings',
-                                           'Mean progeny', 'Default')),
+                                                          'meanProgeny', 'winterMort', 'default'), 
+                                labels = c('Max growth rate', 'Mean female matings',
+                                           'Mean male matings', 'Max female matings',
+                                           'Max male matings', 'Mean progeny', 
+                                           'Winter Mortality', 'Default')),
          lower = mLastGen - semLastGen,
          upper = mLastGen + semLastGen)
 lastGenStats <- lastGenStats[order(lastGenStats$name),] %>%
   group_by(name) %>%
   mutate(wd = (max(value) - min(value)) * 0.1)
 
+test <- lastGen %>%
+  select(generation, repetitions, paramSet, meanProgeny:rmax, winterMort, -k, variableRange) %>%
+  pivot_longer(cols = meanProgeny:winterMort) %>%
+  filter(variableRange == name | variableRange == "default") %>%
+  mutate(name = factor(name, levels = c('rmax','meanFemMatings',
+                                        'meanMalMatings', 'maxFemMatings',
+                                        'maxMalMatings', 'meanProgeny', 'winterMort', 'default'), 
+                       labels = c('Max growth rate',
+                                  'Mean female matings','Mean male matings',
+                                  'Max female matings','Max male matings',
+                                  'Mean progeny', 'Winter Mortality', 'Default')), 
+         variableRange = factor(variableRange, levels = c('rmax','meanFemMatings','meanMalMatings',
+                                                          'maxFemMatings','maxMalMatings',
+                                                          'meanProgeny', 'winterMort', 'default'), 
+                                labels = c('Max growth rate', 'Mean female matings',
+                                           'Mean male matings', 'Max female matings',
+                                           'Max male matings', 'Mean progeny', 
+                                           'Winter Mortality', 'Default'))) %>%
+  group_by(name) %>%
+  mutate(wd = (max(value) - min(value)) * 0.1)  %>%
+  group_by(paramSet) %>%
+  mutate(mLastGen = mean(generation))
 
 ################## plots ##################
 
@@ -178,3 +205,19 @@ p2 <- ggplot(data = lastGenStats) +
   ylab("Last viable generation") +
   xlab("Parameter value") +
   PaperTheme
+
+p3 <- ggplot(test, aes(y = generation, x = value, group = as.factor(paramSet))) +
+  facet_wrap(. ~ name, scales = "free_x") +
+  geom_point(data = test, shape = 1) +
+  geom_col(aes(x = value, y = mLastGen, group = as.factor(paramSet)), width = test$wd, 
+           fill = NA, colour = "black", position = position_dodge()) +
+  PaperTheme
+p3
+
+p <- p1 + p2 + 
+  plot_annotation(tag_levels = "a") +
+  plot_layout(guides = 'collect') & theme(legend.position='bottom') &
+  theme(plot.tag = element_text(size = 14))
+p
+
+ggsave(plot = p, filename = "FigS2.png", height = 20, width = 25, unit = "cm")
