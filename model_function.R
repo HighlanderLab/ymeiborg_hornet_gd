@@ -49,11 +49,11 @@ modelHornets <- function(input){
     pop_m <- pop[(N+nGD+1):((N+nGD)*2)]
     pop_m@sex <- rep("M", pop_m@nInd)
     
-    if (gdSex == "F"){
+    if (gdSex == "F" & nGD != 0){
       pop_f <- editHaplo(pop_f, ind = 1:nGD, chr = rep(1, pop_f@nLoci), 
                           segSites = 1:pop_f@nLoci, allele = 1, 
                           haplotype = rep(1, pop_f@nLoci), simParam = simParam)
-    } else if (gdSex == "M") {
+    } else if (gdSex == "M" & nGD != 0) {
       pop_m <- editGenomeFix(pop_m, ind = 1:nGD, chr = rep(1, pop_m@nLoci), 
                               segSites = 1:pop_m@nLoci, allele = 1, 
                               simParam = simParam)
