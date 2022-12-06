@@ -20,7 +20,7 @@ input$meanMalProgeny <- 20 #average of male progeny per queen
 input$meanFemMatings <- 0.4 #average number of times females mate
 input$meanMalMatings <- 0.9 #average number of times males mate
 input$maxFemMatings <- 4 #maximum number of times females mate
-input$maxMalMatings <- 4 #maximum number of times males mate
+input$maxMalMatings <- 3 #maximum number of times males mate
 input$k <- 1000 #simulated k --> carrying capacity (Carrying capacity K equals to 10.6/km^2)
 input$rmax <- 10 #growth rate of the population
 input$N <- 1000 #size of start WT population
