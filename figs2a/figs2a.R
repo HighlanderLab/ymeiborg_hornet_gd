@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3a")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/figs2a")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3a_[0-9]*.Rdata", full.names=TRUE)
+filenames <- list.files(pattern="FigS2a_[0-9]*.Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -54,15 +54,15 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popS
   group_by(pnhej, cutRate) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3a <- ggplot(data = heatMapData) +
+figs2a <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = cutRate, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Non-homologous end-joining)") +
   ylab("P(Cutting)") +
   ggtitle("Asian hornet") +
   PaperTheme
-fig3a
+figs2a
 
-save(fig3a, file = "Fig3a.Rdata")
-ggsave(plot = fig3a, filename = "Fig3a.png", height = 11, width = 10, unit = "cm")
+save(figs2a, file = "FigS2a.Rdata")
+ggsave(plot = figs2a, filename = "FigS2a.png", height = 11, width = 10, unit = "cm")
 

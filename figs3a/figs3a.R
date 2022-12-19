@@ -57,13 +57,13 @@ modelOutput <- apply(modelOutput, 2, c)
 ########## Save model ###################
 #########################################
 
-save(modelOutput, file = "FigS1a.Rdata")
+save(modelOutput, file = "FigS3a.Rdata")
 
 #########################################
 ########## Plot plots ###################
 #########################################
 
-filenames <- list.files(pattern="FigS1a_[0-9]*.Rdata", full.names=TRUE)
+filenames <- list.files(pattern="FigS3a_[0-9]*.Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -158,8 +158,8 @@ LastGenData <- select(modelOutput, generation, repetitions, strategy, gdSex, pop
 ########## Save model ###################
 #########################################
 
-ggsave(plot = figs1a, filename = "FigS3a.png", height = 12, width = 20, unit = "cm")
+ggsave(plot = figs3a, filename = "FigS3a.png", height = 12, width = 20, unit = "cm")
 
-save(modelOutput, figs1a, file = "FigS3a.Rdata")
+save(modelOutput, figs3a, file = "FigS3a.Rdata")
 
 

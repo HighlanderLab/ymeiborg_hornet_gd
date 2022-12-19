@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3c")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/figs2c")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3c_[0-9]*_[0-9].Rdata", full.names=TRUE)
+filenames <- list.files(pattern="FigS2c_[0-9]*_[0-9].Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -54,19 +54,19 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, pHMort, popSi
   group_by(pnhej, pHMort) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3c <- ggplot(data = heatMapData) +
+figs2c <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Non-homologous end-joining)") +
   ylab("P(GD heterozygote mortality)") +
   ggtitle("Asian hornet") +
   PaperTheme
-fig3c
+figs2c
 
-ggsave(plot = fig3c, filename = "Fig3c.png", height = 11, width = 10, unit = "cm")
+ggsave(plot = figs2c, filename = "FigS2c.png", height = 11, width = 10, unit = "cm")
 
 #########################################
 ########## Save model ###################
 #########################################
 
-save(modelOutput, fig3c, file = "Fig3c.Rdata")
+save(modelOutput, figs2c, file = "FigS2c.Rdata")

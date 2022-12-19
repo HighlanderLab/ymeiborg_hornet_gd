@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/ymeiborg/ymeiborg_hornet_gd/fig3h")
+setwd("/scratch/ymeiborg/ymeiborg_hornet_gd/fig3b")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3h_[0-9]*_[0-9].Rdata", full.names=TRUE)
+filenames <- list.files(pattern="Fig3b_[0-9]*_[0-9].Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -54,7 +54,7 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, pFunctionalRe
   group_by(pnhej, pFunctionalRepair) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3h <- ggplot(data = heatMapData) +
+fig3b <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = pFunctionalRepair, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Non-homologous end-joining)") +
@@ -62,12 +62,12 @@ fig3h <- ggplot(data = heatMapData) +
   ylab("P(Functional repair)") +
   ggtitle("European paper wasp") +
   PaperTheme
-fig3h
+fig3b
 
-ggsave(plot = fig3h, filename = "Fig3h.png", height = 11, width = 10, unit = "cm")
+ggsave(plot = fig3b, filename = "Fig3b.png", height = 11, width = 10, unit = "cm")
 
 #########################################
 ########## Save model ###################
 #########################################
 
-save(modelOutput, fig3h, file = "Fig3h.Rdata")
+save(modelOutput, fig3b, file = "Fig3b.Rdata")

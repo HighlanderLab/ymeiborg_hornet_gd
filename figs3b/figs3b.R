@@ -158,7 +158,7 @@ LastGenData <- select(modelOutput, generation, repetitions, strategy, gdSex, pop
 ########## Save model ###################
 #########################################
 
-ggsave(plot = figs1b, filename = "FigS3b.png", height = 12, width = 20, unit = "cm")
+ggsave(plot = figs3b, filename = "FigS3b.png", height = 12, width = 20, unit = "cm")
 
-save(modelOutput, figs1b, file = "FigS3b.Rdata")
+save(modelOutput, figs3b, file = "FigS3b.Rdata")
 

@@ -2,7 +2,7 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/ymeiborg/ymeiborg_hornet_gd/fig3j")
+setwd("/scratch/ymeiborg/ymeiborg_hornet_gd/figs2f")
 source("../model_function.R")
 
 #########################################
@@ -54,5 +54,5 @@ modelOutput <- apply(modelOutput, 2, c)
 ########## Save model ###################
 #########################################
 
-save(modelOutput, file = "Fig3j_8_4.Rdata")
+save(modelOutput, file = "FigS2f_8_4.Rdata")
 

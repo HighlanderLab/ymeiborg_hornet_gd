@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/ymeiborg/ymeiborg_hornet_gd/fig3i")
+setwd("/scratch/ymeiborg/ymeiborg_hornet_gd/figs2e")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3i_[0-9]*_[0-9].Rdata", full.names=TRUE)
+filenames <- list.files(pattern="FigS2e_[0-9]*_[0-9].Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -54,7 +54,7 @@ heatMapData <- select(modelOutput, generation, repetitions, cutRate, pFunctional
   group_by(pFunctionalRepair, cutRate) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3i <- ggplot(data = heatMapData) +
+figs2e <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pFunctionalRepair, y = cutRate, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   scale_x_continuous(trans='log10') +
@@ -62,8 +62,8 @@ fig3i <- ggplot(data = heatMapData) +
   ylab("P(Cutting)") +
   ggtitle("Asian hornet") +
   PaperTheme
-fig3i
+figs2e
 
-save(fig3i, file = "Fig3i.Rdata")
-ggsave(plot = fig3i, filename = "Fig3i.png", height = 11, width = 10, unit = "cm")
+save(figs2e, file = "FigS2e.Rdata")
+ggsave(plot = figs2e, filename = "FigS2e.png", height = 11, width = 10, unit = "cm")
 

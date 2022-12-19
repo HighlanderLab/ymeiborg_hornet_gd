@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3b")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/figs2b")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3b_[0-9]*.Rdata", full.names=TRUE)
+filenames <- list.files(pattern="FigS2b_[0-9]*.Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -54,19 +54,19 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popS
   group_by(pnhej, cutRate) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3b <- ggplot(data = heatMapData) +
+figs2b <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = cutRate, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Non-homologous end-joining)") +
   ylab("P(Cutting)") +
   ggtitle("European paper wasp") +
   PaperTheme
-fig3b
+figs2b
 
-ggsave(plot = fig3b, filename = "Fig3b.png", height = 11, width = 10, unit = "cm")
+ggsave(plot = figs2b, filename = "FigS2b.png", height = 11, width = 10, unit = "cm")
 
 #########################################
 ########## Save model ###################
 #########################################
 
-save(modelOutput, fig3b, file = "Fig3b.Rdata")
+save(modelOutput, figs2b, file = "FigS2b.Rdata")

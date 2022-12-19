@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3k")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/figs2g")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3k_[0-9]*_[0-9].Rdata", full.names=TRUE)
+filenames <- list.files(pattern="FigS2g_[0-9]*_[0-9].Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -54,7 +54,7 @@ heatMapData <- select(modelOutput, generation, repetitions, pHMort, pFunctionalR
   group_by(pFunctionalRepair, pHMort) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3k <- ggplot(data = heatMapData) +
+figs2g <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pFunctionalRepair, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   scale_x_continuous(trans='log10') +
@@ -62,8 +62,8 @@ fig3k <- ggplot(data = heatMapData) +
   ylab("P(GD heterozygote mortality)") +
   ggtitle("Asian hornet") +
   PaperTheme
-fig3k
+figs2g
 
-save(fig3k, file = "Fig3k.Rdata")
-ggsave(plot = fig3k, filename = "Fig3k.png", height = 11, width = 10, unit = "cm")
+save(figs2g, file = "FigS2g.Rdata")
+ggsave(plot = figs2g, filename = "FigS2g.png", height = 11, width = 10, unit = "cm")
 
