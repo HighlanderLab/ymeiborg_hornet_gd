@@ -92,17 +92,25 @@ PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
         panel.border = element_blank(), 
         title=element_text(size=14, hjust=0.5), 
         plot.title=element_text(size=14, hjust=0.5),
-        #legend.position="none",
         axis.line = element_line(),
-        axis.title=element_text(size=12))
+        axis.title=element_text(size=12),
+        axis.text = element_text(size = 6.5))
 
-year25 <- filter(modelOutput, generation == 25)
+modelOutputGD <- filter(modelOutput, nGD == 100)
+modelOutputNoGD <- filter(modelOutput, nGD == 0)
 
-ntimes <- nrow(year25)/max(inputs$repetitions)
-year25$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
-year25$paramSet <- factor(year25$paramSet)
+year25GD <- filter(modelOutputGD, generation == 25)
+year25NoGD <- filter(modelOutputNoGD, generation == 25)
 
-suppressed <- rowwise(year25) %>%
+ntimes <- nrow(year25GD)/max(inputs$repetitions)
+year25GD$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
+year25GD$paramSet <- factor(year25GD$paramSet)
+year25NoGD$paramSet <- rep(1:ntimes, each = max(inputs$repetitions))
+year25NoGD$paramSet <- factor(year25NoGD$paramSet)
+
+################# Gene Drive data ###################
+
+suppressedGD <- rowwise(year25GD) %>%
   mutate(suppressed = case_when(popSizeF == 0 ~ 1,
                                 popSizeF > 0 ~ 0)) %>%
   group_by(paramSet) %>%
@@ -111,57 +119,25 @@ suppressed <- rowwise(year25) %>%
   select(paramSet, meanProgeny:maxMalMatings, rmax, winterMort, suppressionRate, variableRange) %>%
   pivot_longer(cols = meanProgeny:winterMort) %>%
   filter(variableRange == name | variableRange == "default") %>%
-  mutate(name = factor(name)) %>%
+  mutate(name = factor(name), condition = "Gene Drive") %>%
   arrange(name)
 
-suppressed$name <- factor(suppressed$name, 
-                          levels = c('rmax','meanFemMatings','meanMalMatings',
-                                     'maxFemMatings','maxMalMatings',
-                                     'meanProgeny', 'winterMort', 'default'), 
-                          labels = c('Max growth rate','Mean female matings','Mean male matings',
-                                     'Max female matings','Max male matings',
-                                     'Mean progeny', 'Winter Mortality', 'Default'))
-suppressed <- suppressed[order(suppressed$name),]
+suppressedGD$name <- factor(suppressedGD$name, 
+                            levels = c('rmax','meanFemMatings','meanMalMatings',
+                                       'maxFemMatings','maxMalMatings',
+                                       'meanProgeny', 'winterMort', 'default'), 
+                            labels = c('Max growth rate','Mean female matings','Mean male matings',
+                                       'Max female matings','Max male matings',
+                                       'Mean progeny', 'Winter Mortality', 'Default'))
+suppressedGD <- suppressedGD[order(suppressedGD$name),]
 
-modelOutput$paramSet <- rep(1:ntimes, each = nrow(modelOutput)/ntimes)
-modelOutput$paramSet <- factor(modelOutput$paramSet)
+modelOutputGD$paramSet <- rep(1:ntimes, each = nrow(modelOutputGD)/ntimes)
+modelOutputGD$paramSet <- factor(modelOutputGD$paramSet)
 
-lastGen <- modelOutput %>%
-  filter(popSizeF != 0) %>%
+lastGenStatsGD <- modelOutputGD %>%
+  filter((popSizeF == 0 & generation != 25) | (popSizeF != 0 & generation == 25)) %>%
   group_by(paramSet, repetitions) %>%
-  filter(generation == max(generation))
-
-lastGenStats <- group_by(lastGen, paramSet) %>%
-  summarise(mLastGen = mean(generation),
-            semLastGen = sd(generation)/sqrt(10)) 
-
-lastGenStats <- left_join(x = lastGenStats, 
-                          y = lastGen, by = "paramSet") %>%
-  distinct(paramSet, .keep_all = TRUE) %>%
-  select(paramSet:semLastGen, meanProgeny:rmax, winterMort, -k, variableRange) %>%
-  pivot_longer(cols = meanProgeny:winterMort) %>%
-  filter(variableRange == name | variableRange == "default") %>%
-  mutate(name = factor(name, levels = c('rmax','meanFemMatings',
-                                        'meanMalMatings', 'maxFemMatings',
-                                        'maxMalMatings', 'meanProgeny', 'winterMort', 'default'), 
-                       labels = c('Max growth rate',
-                                  'Mean female matings','Mean male matings',
-                                  'Max female matings','Max male matings',
-                                  'Mean progeny', 'Winter Mortality', 'Default')), 
-         variableRange = factor(variableRange, levels = c('rmax','meanFemMatings','meanMalMatings',
-                                                          'maxFemMatings','maxMalMatings',
-                                                          'meanProgeny', 'winterMort', 'default'), 
-                                labels = c('Max growth rate', 'Mean female matings',
-                                           'Mean male matings', 'Max female matings',
-                                           'Max male matings', 'Mean progeny', 
-                                           'Winter Mortality', 'Default')),
-         lower = mLastGen - semLastGen,
-         upper = mLastGen + semLastGen)
-lastGenStats <- lastGenStats[order(lastGenStats$name),] %>%
-  group_by(name) %>%
-  mutate(wd = (max(value) - min(value)) * 0.1)
-
-test <- lastGen %>%
+  filter(generation == min(generation)) %>%
   select(generation, repetitions, paramSet, meanProgeny:rmax, winterMort, -k, variableRange) %>%
   pivot_longer(cols = meanProgeny:winterMort) %>%
   filter(variableRange == name | variableRange == "default") %>%
@@ -180,44 +156,126 @@ test <- lastGen %>%
                                            'Max male matings', 'Mean progeny', 
                                            'Winter Mortality', 'Default'))) %>%
   group_by(name) %>%
-  mutate(wd = (max(value) - min(value)) * 0.1)  %>%
+  mutate(wd = (max(value) - min(value)) * 0.075)  %>%
   group_by(paramSet) %>%
-  mutate(mLastGen = mean(generation))
+  mutate(mLastGen = mean(generation),
+         semLastGen = sd(generation)/sqrt(10),
+         lower = mLastGen - semLastGen,
+         upper = mLastGen + semLastGen,
+         condition = "Gene Drive")
+
+################# No Gene Drive data ###################
+
+suppressedNoGD <- rowwise(year25NoGD) %>%
+  mutate(suppressed = case_when(popSizeF == 0 ~ 1,
+                                popSizeF > 0 ~ 0)) %>%
+  group_by(paramSet) %>%
+  mutate(suppressionRate = sum(suppressed)/10) %>%
+  distinct(paramSet, .keep_all = TRUE) %>%
+  select(paramSet, meanProgeny:maxMalMatings, rmax, winterMort, suppressionRate, variableRange) %>%
+  pivot_longer(cols = meanProgeny:winterMort) %>%
+  filter(variableRange == name | variableRange == "default") %>%
+  mutate(name = factor(name), condition = "No Gene Drive") %>%
+  arrange(name)
+
+suppressedNoGD$name <- factor(suppressedNoGD$name, 
+                              levels = c('rmax','meanFemMatings','meanMalMatings',
+                                         'maxFemMatings','maxMalMatings',
+                                         'meanProgeny', 'winterMort', 'default'), 
+                              labels = c('Max growth rate','Mean female matings','Mean male matings',
+                                         'Max female matings','Max male matings',
+                                         'Mean progeny', 'Winter Mortality', 'Default'))
+suppressedNoGD <- suppressedNoGD[order(suppressedNoGD$name),]
+
+modelOutputNoGD$paramSet <- rep(1:ntimes, each = nrow(modelOutputNoGD)/ntimes)
+modelOutputNoGD$paramSet <- factor(modelOutputNoGD$paramSet)
+
+lastGenStatsNoGD <- modelOutputNoGD %>%
+  filter((popSizeF == 0 & generation != 25) | (popSizeF != 0 & generation == 25)) %>%
+  group_by(paramSet, repetitions) %>%
+  filter(generation == min(generation)) %>%
+  select(generation, repetitions, paramSet, meanProgeny:rmax, winterMort, -k, variableRange) %>%
+  pivot_longer(cols = meanProgeny:winterMort) %>%
+  filter(variableRange == name | variableRange == "default") %>%
+  mutate(name = factor(name, levels = c('rmax','meanFemMatings',
+                                        'meanMalMatings', 'maxFemMatings',
+                                        'maxMalMatings', 'meanProgeny', 'winterMort', 'default'), 
+                       labels = c('Max growth rate',
+                                  'Mean female matings','Mean male matings',
+                                  'Max female matings','Max male matings',
+                                  'Mean progeny', 'Winter Mortality', 'Default')), 
+         variableRange = factor(variableRange, levels = c('rmax','meanFemMatings','meanMalMatings',
+                                                          'maxFemMatings','maxMalMatings',
+                                                          'meanProgeny', 'winterMort', 'default'), 
+                                labels = c('Max growth rate', 'Mean female matings',
+                                           'Mean male matings', 'Max female matings',
+                                           'Max male matings', 'Mean progeny', 
+                                           'Winter Mortality', 'Default'))) %>%
+  group_by(name) %>%
+  mutate(wd = (max(value) - min(value)) * 0.075)  %>%
+  group_by(paramSet) %>%
+  mutate(mLastGen = mean(generation),
+         semLastGen = sd(generation)/sqrt(10),
+         lower = mLastGen - semLastGen,
+         upper = mLastGen + semLastGen,
+         condition = 'No Gene Drive')
+
+############## combine data ################
+
+suppressed <- bind_rows(suppressedGD, suppressedNoGD) %>%
+  mutate(condition = factor(condition, levels = c("No Gene Drive", "Gene Drive"))) %>%
+  arrange(condition)
+
+lastGenStats <- bind_rows(lastGenStatsGD, lastGenStatsNoGD) %>%
+  mutate(condition = factor(condition, levels = c("No Gene Drive", "Gene Drive"))) %>%
+  arrange(condition)
 
 ################## plots ##################
+cols <- c(met.brewer("Greek", n = 2)[2], met.brewer("Greek", n = 2)[1])
 
-p1 <- ggplot(data = suppressed) +
-  facet_wrap(. ~ name, scales = "free_x") +
-  geom_line(aes(x = value, y = suppressionRate)) +
-  geom_point(aes(x = value, y = suppressionRate)) +
+fig4a <- ggplot(data = suppressed) +
+  facet_wrap(. ~ name, scales = "free_x",
+             labeller = labeller(name = label_wrap_gen(width = 16))) +
+  geom_line(aes(x = value, y = suppressionRate, col = condition)) +
+  geom_point(aes(x = value, y = suppressionRate, col = condition)) +
+  scale_colour_manual(values=cols,
+                      name = "Gene drive conditions") +
   ylim(c(0,1)) +
   ylab("Suppression rate") +
   xlab("Parameter value") + 
+  ggtitle("Asian hornet") +
+  guides(colour = guide_legend(reverse = TRUE)) +
   PaperTheme
+fig4a
 
-p2 <- ggplot(data = lastGenStats) +
-  facet_wrap(. ~ name, scales = "free_x") +
-  geom_line(aes(x = value, y = mLastGen)) +
-  geom_point(aes(x = value, y = mLastGen)) +
+fig4b <- ggplot(lastGenStats, aes(x = value, y = generation, col = condition)) +
+  facet_wrap(. ~ name, scales = "free_x",
+             labeller = labeller(name = label_wrap_gen(width = 16))) +
+  stat_summary(fun = mean, geom = "line",lwd = 0.5, aes(col = condition)) +
+  stat_summary(fun = mean, geom = "point", size = 1.5, aes(col = condition)) +
   geom_errorbar(aes(x = value, y = mLastGen, ymin = lower, ymax = upper), 
-                size = 0.1, width = lastGenStats$wd) +
-  ylim(c(0,25)) +
-  ylab("Last viable generation") +
+                size = 0.1, width = lastGenStats$wd, colour = "black") +
+  scale_colour_manual(values = cols,
+                      name = "Gene drive conditions",
+                      breaks = c("No Gene Drive", "Gene Drive")) +
+  scale_y_continuous(breaks = seq(0, 25, 5), 
+                     labels = c(seq(0, 20, 5), "No supp.")) +
+  ylab("Time to suppression (generation)") +
   xlab("Parameter value") +
+  guides(colour = "none") +
+  ggtitle("Asian hornet") +
+  geom_point(shape = 1, alpha = 0.8) +
   PaperTheme
+fig4b
 
-p3 <- ggplot(test, aes(y = generation, x = value, group = as.factor(paramSet))) +
-  facet_wrap(. ~ name, scales = "free_x") +
-  geom_point(data = test, shape = 1) +
-  geom_col(aes(x = value, y = mLastGen, group = as.factor(paramSet)), width = test$wd, 
-           fill = NA, colour = "black", position = position_dodge()) +
-  PaperTheme
-p3
-
-p <- p1 + p2 + 
+p <- fig4a + fig4b + 
   plot_annotation(tag_levels = "a") +
   plot_layout(guides = 'collect') & theme(legend.position='bottom') &
   theme(plot.tag = element_text(size = 14))
 p
 
-ggsave(plot = p, filename = "FigS2.png", height = 20, width = 25, unit = "cm")
+
+ggsave(plot = p, filename = "FigS2.png", height = 15, width = 25, unit = "cm")
+
+save(modelOutput, fig4a, fig4b, file = "Fig4ab.Rdata")
+
