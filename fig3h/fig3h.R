@@ -22,7 +22,6 @@ for (index in 2:length(filenames)){
 
 modelOutput <- allData
 
-load(file = "../dataGD.Rdata")
 #########################################
 ########## Plot plots ###################
 #########################################
@@ -36,9 +35,6 @@ PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
         legend.justification = "center",
         legend.box = "vertical",
         axis.title=element_text(size=12))
-
-
-modelOutput <- as_tibble(modelOutput)
 
 modelOutput <- mutate(modelOutput,
                         strategy = factor(strategy),
@@ -61,8 +57,6 @@ heatMapData <- select(modelOutput, generation, repetitions, pnhej, pFunctionalRe
 fig3h <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pnhej, y = pFunctionalRepair, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  #geom_point(data = dataGD, aes(x = Pnhej, y = pFunctionalRepair, shape = `Gene drive condition`), fill = "white") +
-  #scale_shape_manual(values = 21:23) +
   xlab("P(Non-homologous end-joining)") +
   scale_y_continuous(trans='log10') +
   ylab("P(Functional repair)") +

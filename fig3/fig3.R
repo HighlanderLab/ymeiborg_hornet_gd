@@ -9,10 +9,8 @@ source("../model_function.R")
 ######## load data ##########
 #############################
 
-load(file = "../fig3a/Fig3a.Rdata")
-load(file = "../fig3b/Fig3b.Rdata")
-load(file = "../fig3c/Fig3c.Rdata")
-load(file = "../fig3d/Fig3d.Rdata")
+load(file = "../fig3g/Fig3g.Rdata")
+load(file = "../fig3h/fig3h.Rdata")
 load(file = "../fig3e/Fig3e.Rdata")
 load(file = "../fig3f/Fig3f.Rdata")
 
@@ -20,8 +18,7 @@ load(file = "../fig3f/Fig3f.Rdata")
 ########## Plot plots ###################
 #########################################
 
-fig3 <- (fig3a | fig3b) /
-  (fig3c | fig3d) /
+fig3 <- (fig3g | fig3h) /
   (fig3e | fig3f) +
   plot_layout(guides = 'collect') &
   plot_annotation(tag_levels = 'a') &
@@ -30,4 +27,4 @@ fig3 <- (fig3a | fig3b) /
         legend.box = "vertical")
 fig3
 
-ggsave(plot = fig3, filename = "Fig3.png", height = 25, width = 20, unit = "cm")
+ggsave(plot = fig3, filename = "Fig3.png", height = 20, width = 20, unit = "cm")

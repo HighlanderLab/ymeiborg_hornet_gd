@@ -22,7 +22,6 @@ for (index in 2:length(filenames)){
 
 modelOutput <- allData
 
-load(file = "../dataGD.Rdata")
 #########################################
 ########## Plot plots ###################
 #########################################
@@ -58,8 +57,6 @@ heatMapData <- select(modelOutput, generation, repetitions, pHMort, pFunctionalR
 fig3k <- ggplot(data = heatMapData) +
   geom_raster(aes(x = pFunctionalRepair, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  #geom_point(data = dataGD, aes(x = pFunctionalRepair, y = Pcut, shape = `Gene drive condition`), fill = "white") +
-  #scale_shape_manual(values = 21:23) +
   scale_x_continuous(trans='log10') +
   xlab("P(Functional repair)") +
   ylab("P(GD heterozygote mortality)") +
