@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #FILENAME: slurm5_3.job
-#SBATCH -J hornet_fig3c_5_3 # job name
+#SBATCH -J hornet_fig3e_5_3 # job name name
 #SBATCH -A bharpur # partition name
 #SBATCH -N 1 # number of nodes
 #SBATCH -n 9 # number of cores
 #SBATCH -t 3-00:00:00
 #SBATCH --mem=50000 # memory
-#SBATCH -o job_out_5_3  # assign standard output file name
-#SBATCH -e job_err_5_3  # assign standard error file name
+#SBATCH -o job_out_5_3 # assign standard output file name
+#SBATCH -e job_err_5_3 # assign standard error file name
 #SBATCH --mail-type=end,fail # email you when begin, end, fail, requeue
 #SBATCH --mail-user=ymeiborg@purdue.edu # email address
 
@@ -16,6 +16,6 @@ module load r/4.0.0 # load R
 
 echo "Beginning_3.jobbo"
 
-Rscript fig3c_5_3.R
+Rscript fig3e_5_3.R
 
 echo "Done with_3.jobbo"

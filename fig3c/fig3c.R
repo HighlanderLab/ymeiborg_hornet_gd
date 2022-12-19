@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3c")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3e")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3c_[0-9]*_[0-9].Rdata", full.names=TRUE)
+filenames <- list.files(pattern="Fig3e_[0-9]*_[0-9].Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -46,27 +46,27 @@ modelOutput <- mutate(modelOutput,
                       generations = factor(generations),
                       repetitions = factor(repetitions))
 
-heatMapData <- select(modelOutput, generation, repetitions, pnhej, pHMort, popSizeF) %>%
+heatMapData <- select(modelOutput, generation, repetitions, cutRate, pHMort, popSizeF) %>%
   filter(generation == max(generation)) %>%
   rowwise() %>%
   mutate(suppressed = case_when(popSizeF == 0 ~ 1,
                                 popSizeF > 0 ~ 0)) %>%
-  group_by(pnhej, pHMort) %>%
+  group_by(cutRate, pHMort) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3c <- ggplot(data = heatMapData) +
-  geom_raster(aes(x = pnhej, y = pHMort, fill = suppressionRate)) +
+fig3e <- ggplot(data = heatMapData) +
+  geom_raster(aes(x = cutRate, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  xlab("P(Non-homologous end-joining)") +
+  xlab("P(Cutting)") +
   ylab("P(GD heterozygote mortality)") +
   ggtitle("Asian hornet") +
   PaperTheme
-fig3c
+fig3e
 
-ggsave(plot = fig3c, filename = "Fig3c.png", height = 11, width = 10, unit = "cm")
+ggsave(plot = fig3e, filename = "Fig3e.png", height = 11, width = 10, unit = "cm")
 
 #########################################
 ########## Save model ###################
 #########################################
 
-save(modelOutput, fig3c, file = "Fig3c.Rdata")
+save(modelOutput, fig3e, file = "Fig3e.Rdata")

@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3a")
+setwd("/scratch/ymeiborg/ymeiborg_hornet_gd/fig3g")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3a_[0-9]*.Rdata", full.names=TRUE)
+filenames <- list.files(pattern="Fig3g_[0-9]*_[0-9].Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -46,23 +46,24 @@ modelOutput <- mutate(modelOutput,
                         generations = factor(generations),
                         repetitions = factor(repetitions))
 
-heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popSizeF) %>%
+heatMapData <- select(modelOutput, generation, repetitions, pnhej, pFunctionalRepair, popSizeF) %>%
   filter(generation == max(generation)) %>%
   rowwise() %>%
   mutate(suppressed = case_when(popSizeF == 0 ~ 1,
                                 popSizeF > 0 ~ 0)) %>%
-  group_by(pnhej, cutRate) %>%
+  group_by(pnhej, pFunctionalRepair) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3a <- ggplot(data = heatMapData) +
-  geom_raster(aes(x = pnhej, y = cutRate, fill = suppressionRate)) +
+fig3g <- ggplot(data = heatMapData) +
+  geom_raster(aes(x = pnhej, y = pFunctionalRepair, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Non-homologous end-joining)") +
-  ylab("P(Cutting)") +
+  scale_y_continuous(trans='log10') +
+  ylab("P(Functional repair)") +
   ggtitle("Asian hornet") +
   PaperTheme
-fig3a
+fig3g
 
-save(fig3a, file = "Fig3a.Rdata")
-ggsave(plot = fig3a, filename = "Fig3a.png", height = 11, width = 10, unit = "cm")
+save(fig3g, file = "Fig3g.Rdata")
+ggsave(plot = fig3g, filename = "Fig3g.png", height = 11, width = 10, unit = "cm")
 

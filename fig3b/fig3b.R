@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3b")
+setwd("/scratch/ymeiborg/ymeiborg_hornet_gd/fig3h")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3b_[0-9]*.Rdata", full.names=TRUE)
+filenames <- list.files(pattern="Fig3h_[0-9]*_[0-9].Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -46,27 +46,28 @@ modelOutput <- mutate(modelOutput,
                         generations = factor(generations),
                         repetitions = factor(repetitions))
 
-heatMapData <- select(modelOutput, generation, repetitions, pnhej, cutRate, popSizeF) %>%
+heatMapData <- select(modelOutput, generation, repetitions, pnhej, pFunctionalRepair, popSizeF) %>%
   filter(generation == max(generation)) %>%
   rowwise() %>%
   mutate(suppressed = case_when(popSizeF == 0 ~ 1,
                                 popSizeF > 0 ~ 0)) %>%
-  group_by(pnhej, cutRate) %>%
+  group_by(pnhej, pFunctionalRepair) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3b <- ggplot(data = heatMapData) +
-  geom_raster(aes(x = pnhej, y = cutRate, fill = suppressionRate)) +
+fig3h <- ggplot(data = heatMapData) +
+  geom_raster(aes(x = pnhej, y = pFunctionalRepair, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
   xlab("P(Non-homologous end-joining)") +
-  ylab("P(Cutting)") +
+  scale_y_continuous(trans='log10') +
+  ylab("P(Functional repair)") +
   ggtitle("European paper wasp") +
   PaperTheme
-fig3b
+fig3h
 
-ggsave(plot = fig3b, filename = "Fig3b.png", height = 11, width = 10, unit = "cm")
+ggsave(plot = fig3h, filename = "Fig3h.png", height = 11, width = 10, unit = "cm")
 
 #########################################
 ########## Save model ###################
 #########################################
 
-save(modelOutput, fig3b, file = "Fig3b.Rdata")
+save(modelOutput, fig3h, file = "Fig3h.Rdata")

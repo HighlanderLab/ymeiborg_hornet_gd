@@ -2,14 +2,14 @@
 ########## Setup #########
 ##########################
 
-setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3d")
+setwd("/scratch/bell/ymeiborg/ymeiborg_hornet_gd/fig3f")
 source("../model_function.R")
 
 #############################
 ######## load data ##########
 #############################
 
-filenames <- list.files(pattern="Fig3d_[0-9]*.Rdata", full.names=TRUE)
+filenames <- list.files(pattern="Fig3f_[0-9]*.Rdata", full.names=TRUE)
 load(filenames[1])
 allData <- as_tibble(modelOutput)
 
@@ -46,27 +46,27 @@ modelOutput <- mutate(modelOutput,
                       generations = factor(generations),
                       repetitions = factor(repetitions))
 
-heatMapData <- select(modelOutput, generation, repetitions, pnhej, pHMort, popSizeF) %>%
+heatMapData <- select(modelOutput, generation, repetitions, cutRate, pHMort, popSizeF) %>%
   filter(generation == max(generation)) %>%
   rowwise() %>%
   mutate(suppressed = case_when(popSizeF == 0 ~ 1,
                                 popSizeF > 0 ~ 0)) %>%
-  group_by(pnhej, pHMort) %>%
+  group_by(cutRate, pHMort) %>%
   summarise(suppressionRate = sum(suppressed)/10)
 
-fig3d <- ggplot(data = heatMapData) +
-  geom_raster(aes(x = pnhej, y = pHMort, fill = suppressionRate)) +
+fig3f <- ggplot(data = heatMapData) +
+  geom_raster(aes(x = cutRate, y = pHMort, fill = suppressionRate)) +
   scale_fill_gradientn(colors=met.brewer("Greek"), limits = c(0,1), name = "Suppression rate") +
-  xlab("P(Non-homologous end-joining)") +
+  xlab("P(Cutting)") +
   ylab("P(GD heterozygote mortality)") +
   ggtitle("European paper wasp") +
   PaperTheme
-fig3d
+fig3f
 
-ggsave(plot = fig3d, filename = "Fig3d.png", height = 11, width = 10, unit = "cm")
+ggsave(plot = fig3f, filename = "Fig3f.png", height = 11, width = 10, unit = "cm")
 
 #########################################
 ########## Save model ###################
 #########################################
 
-save(modelOutput, fig3d, file = "Fig3d.Rdata")
+save(modelOutput, fig3f, file = "Fig3f.Rdata")
