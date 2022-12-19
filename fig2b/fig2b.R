@@ -115,7 +115,7 @@ fig2b <- ggplot(data = haploRep) +
     group = interaction(Allele, repetitions),
     colour = Allele
   )) +
-  scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
+  scale_colour_manual(values = alpha(colour = met.brewer("Greek", 5)[-2], 
                                      alpha = 0.15)) +
   guides(colour = guide_legend(override.aes = list(alpha = 1))) +
   xlab("Generation") +
