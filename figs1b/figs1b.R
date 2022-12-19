@@ -63,6 +63,20 @@ save(modelOutput, file = "FigS1b.Rdata")
 ########## Plot plots ###################
 #########################################
 
+filenames <- list.files(pattern="FigS1b_[0-9]*.Rdata", full.names=TRUE)
+load(filenames[1])
+allData <- as_tibble(modelOutput)
+
+for (index in 2:length(filenames)){
+  load(filenames[index])
+  modelOutput <- as_tibble(modelOutput)
+  allData <- rbind(allData, modelOutput)
+}
+
+modelOutput <- allData %>%
+  arrange(gdSex, strategy) %>%
+  mutate(repetitions = rep(1:100, each = 26, times = 8))
+
 PaperTheme <- theme_bw(base_size = 11, base_family = "sans") +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -115,7 +129,7 @@ figs1b <- ggplot(data = haploRep) +
     group = interaction(Allele, repetitions),
     colour = Allele
   )) +
-  scale_colour_manual(values = alpha(colour = met.brewer("Greek", 4), 
+  scale_colour_manual(values = alpha(colour = met.brewer("Greek", 5)[-2], 
                                      alpha = 0.15)) +
   guides(colour = guide_legend(override.aes = list(alpha = 1))) +
   xlab("Generation") +
