@@ -26,7 +26,7 @@ load(file = "../figs2h/Figs2h.Rdata")
 figs2 <- (figs2a | figs2b) /
   (figs2c | figs2d) /
   (figs2e | figs2f) /
-  (figs2g | fig3s2h) +
+  (figs2g | figs2h) +
   plot_layout(guides = 'collect') &
   plot_annotation(tag_levels = 'a') &
   theme(plot.tag = element_text(size = 14), 

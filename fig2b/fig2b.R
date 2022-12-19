@@ -135,7 +135,7 @@ popRep <- as_tibble(modelOutput) %>%
                                      "Female infertility", 
                                      "Both-sex infertility")))
 
-figs0b <- ggplot(data = popRep) +
+figs1b <- ggplot(data = popRep) +
   facet_grid(
     Release ~ strategy,
     scales = "fixed",
@@ -150,7 +150,7 @@ figs0b <- ggplot(data = popRep) +
   ylab("Female population size") +
   ggtitle("European paper wasp") +
   PaperTheme
-figs0b
+figs1b
 
 suppRateData <- select(modelOutput, generation, repetitions, strategy, gdSex, popSizeF) %>%
   filter(generation == max(generation)) %>%
@@ -177,6 +177,6 @@ ggsave(plot = fig2b, filename = "Fig2b.png", height = 12, width = 20, unit = "cm
 
 save(modelOutput, fig2b, file = "Fig2b.Rdata")
 
-ggsave(plot = figs0b, filename = "FigS0a.png", height = 12, width = 20, unit = "cm")
+ggsave(plot = figs1b, filename = "FigS1b.png", height = 12, width = 20, unit = "cm")
 
-save(figs0b, file = "FigS0b.Rdata")
+save(figs1b, file = "FigS1b.Rdata")
